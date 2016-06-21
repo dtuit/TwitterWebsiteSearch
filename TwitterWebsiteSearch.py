@@ -8,10 +8,11 @@ __author__ = 'Darren Tuit'
 
 class TwitterWebsiteSearch():
 
-    def __init__(self, rate_delay, error_delay=5):
+    def __init__(self, rate_delay, error_delay=5, timeout=5, retry_limit=4):
         self.rate_delay = rate_delay
         self.error_delay = error_delay
-        # self.retry_limit = retry_limit
+        self.timeout = timeout
+        self.retry_limit = retry_limit
 
         self.base_url = 'https://twitter.com/i/search/timeline'
     
@@ -124,69 +125,13 @@ if __name__ == '__main__':
 
     uniq_tw_ids = {}
 
+    count = 0
+
     for tweets in search_generator:
         for tweet in tweets:
-            key = tweet['id_str']
-            if key in uniq_tw_ids:
-                print('key collsion: {0}'.format(key))
-            else:
-                uniq_tw_ids[key] = key
-            print(key)
+            count += 1
+            print('{0}, {1}, {2}'.format(count, tweet['id_str'], tweet['text']))
+        print(len(tweets))
 
-# sys.stdout = open('outfile.txt', 'w')
-
-# url = 'https://twitter.com/i/search/timeline'
-# payload = {
-#     'q' : '$AAPL'
-# }
-
-# result = requests.get(url, params=payload)
-# json_result = result.json()
-
-# soup = BeautifulSoup(json_result['items_html'], "lxml")
-
-# tweets = []
-
-# for li in soup.findAll('li', attrs={'class':'js-stream-item'}):
-
-#     # Check if is a tweet otherwise skip
-#     if 'data-item-id' not in li.attrs:
-#         continue
-    
-#     tweet = {
-#         'created_at' : None,
-#         'id_str' : li['data-item-id'],
-#         'text' : None,
-#         'in_reply_to_screen_name': None,
-#         'user' : {
-#             'id_str' : None,
-#             'name' : None,
-#             'screen_name': None
-#             },
-#         'retweet_count' : 0,
-#         'favorite_count' : 0,
-#         }
-
-#     text_p = li.find('p', class_="tweet-text")
-#     if text_p is not None:
-#         tweet['text'] = text_p.get_text()
-
-#     user_div = li.find('div' , class_="tweet")
-#     if user_div is not None:
-#         tweet['user']['id_str'] = extract_attr_value(user_div, 'data-user-id')
-#         tweet['user']['name'] = extract_attr_value(user_div, 'data-name')
-#         tweet['user']['screen_name'] = extract_attr_value(user_div, 'data-screen-name')
-    
-#     date_span = li.find('span', class_="_timestamp")
-#     if date_span is not None:
-#         tweet['created_at'] = int(extract_attr_value(date_span, 'data-time-ms'))
-        
-#     retweet_span = li.select("span.ProfileTweet-action--retweet > span.ProfileTweet-actionCount")
-#     if retweet_span is not None:
-#         tweet['retweet_count'] = int(extract_attr_value(retweet_span[0], 'data-tweet-stat-count'))
-
-#     fav_span = li.select("span.ProfileTweet-action--favorite > span.ProfileTweet-actionCount")
-#     if fav_span is not None:
-#         tweet['favorite_count'] = int(extract_attr_value(fav_span[0], 'data-tweet-stat-count'))
-    
-#     tweets.append(tweet)
+        if count > 100:
+            break
