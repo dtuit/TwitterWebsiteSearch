@@ -12,6 +12,7 @@ class TwitterWebsiteSearch():
         self.rate_delay = rate_delay
         self.error_delay = error_delay
         self.timeout = timeout
+        # TODO: impl timeout and retry
         self.retry_limit = retry_limit
 
         self.base_url = 'https://twitter.com/i/search/timeline'
@@ -111,6 +112,8 @@ class TwitterWebsiteSearch():
             if fav_span is not None:
                 tweet['favorite_count'] = int(cls._extract_attr_value(fav_span[0], 'data-tweet-stat-count'))
             
+            # TODO: extract more values
+
             tweets.append(tweet)
         return tweets 
     
@@ -134,4 +137,4 @@ if __name__ == '__main__':
         print(len(tweets))
 
         if count > 100:
-            break
+            break,
