@@ -18,6 +18,7 @@ class TwitterWebsiteSearch():
 
         self.base_url = 'https://twitter.com/i/search/timeline'
     
+    # TODO account for the f param f=tweets, f=news, f=videos
     def search_generator(self, query, min_tweet_id=None, max_tweet_id=None):
         s = Session()
         max_position = None
