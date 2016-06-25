@@ -5,7 +5,7 @@ TwitterWebsiteSearch is a small python library for searching and saving data fro
 ##Format
 Data extracted is formatted similarly to is given official API detailed [here](https://dev.twitter.com/overview/api/tweets)
 
-```json
+```
 {
 	'created_at' : UTC UNIX timestamp,
 	'id_str' : "",
