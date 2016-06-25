@@ -2,15 +2,16 @@
 
 TwitterWebsiteSearch is a small python library for searching and saving data from [Twitter.com search](https://twitter.com/search-home) without using the [official API](https://dev.twitter.com/rest/public/search). 
 
-##Format
-Data extracted is formatted similarly to is given official API detailed [here](https://dev.twitter.com/overview/api/tweets)
+##Data Format
+Tweets extracted, are formatted similarly to the official API, detailed [here](https://dev.twitter.com/overview/api/tweets)
 
+each tweet is a python dict with the following structure.
 ```
 {
-	'created_at' : UTC UNIX timestamp,
+	'created_at' : UTC-UNIX-timestamp,
 	'id_str' : "",
 	'text' : "",
-		'entities': {
+	'entities': {
 		'hashtags': [],
 		'symbols':[],
 		'user_mentions':[],
@@ -32,7 +33,7 @@ create your query using [twitter advanced search](https://twitter.com/search-adv
 ```python
 
 	tw = TwitterWebsiteSearch(0)
-	search_generator = tw.search_generator('#python')
+	search_generator = tw.search_generator('YOUR_QUERY')
 	
 	for result in search_generator:
 	    count = 0
