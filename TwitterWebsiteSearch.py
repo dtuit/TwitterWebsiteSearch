@@ -35,6 +35,7 @@ class TwitterWebsiteSearch():
             tweets = self.parse_tweets(result_json['items_html']) 
             
             if len(tweets) == 0:
+                print('No tweets returned terminating program')
                 break
             
             if min_tweet_id is None:
@@ -192,6 +193,8 @@ class TwitterWebsiteSearch():
         if tag.has_attr(attr):
             return tag[attr]
         return None
+
+def on_no_result try contu
 
 if __name__ == '__main__':
     tw = TwitterWebsiteSearch(0)
