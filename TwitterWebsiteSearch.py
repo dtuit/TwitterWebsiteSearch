@@ -9,12 +9,13 @@ __author__ = 'Darren Tuit'
 
 class TwitterWebsiteSearch():
 
-    def __init__(self, rate_delay, error_delay=5, timeout=5, retry_limit=4):
+    def __init__(self, rate_delay, error_delay=5, timeout=5, retry_limit=4, continue_on_empty_result=True):
         self.rate_delay = rate_delay
         self.error_delay = error_delay
         # TODO: impl timeout and retry
         self.timeout = timeout
         self.retry_limit = retry_limit
+        self.continue_on_empty_result = continue_on_empty_result
 
         self.base_url = 'https://twitter.com/i/search/timeline'
     
@@ -32,11 +33,31 @@ class TwitterWebsiteSearch():
         result_json = self.execute_request(request)
         
         while result_json is not None and result_json['items_html'] is not None:
+            
             tweets = self.parse_tweets(result_json['items_html']) 
             
             if len(tweets) == 0:
-                print('No tweets returned terminating program')
-                break
+                if not self.continue_on_empty_result:
+                    print('No tweets returned terminating program')
+                    break
+                else:
+                    # Sometimes the API stops returning tweets even when there are more
+                    # we can try to find these tweets by modifying the max_position parameter.
+                    int_max_id = int(max_tweet_id)
+                    # int_min_id = int(min_tweet_id)
+                    # found_new_position = False
+                    for x in range(8, len(max_tweet_id)):
+                        max_to_try = int_max_id - 10**x
+                        max_position = self.encode_max_postion_param(min_tweet_id, str(max_to_try))
+                        request = self.prepare_request(self.base_url, query, max_position)
+                        result_json = self.execute_request(request)
+                        tweets = self.parse_tweets(result_json['items_html'])
+                        if len(tweets) > 0:
+                            break
+                    else:
+                        print('No tweets returned terminating program')
+                        # if we didnt find any point to continue from break anyway.
+                        break
             
             if min_tweet_id is None:
                 min_tweet_id = tweets[0]['id_str']
@@ -83,7 +104,7 @@ class TwitterWebsiteSearch():
         if max_position is not None:
             payload['max_position'] = max_position
         headers = {
-            'user-agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Ubuntu Chromium/29.0.1547.65 Chrome/29.0.1547.65 Safari/537.36',
+            'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Ubuntu Chromium/29.0.1547.65 Chrome/29.0.1547.65 Safari/537.36',
             'Accept-Encoding' : 'gzip, deflate, sdch, br'
         }
         req = Request('GET', url, params=payload, headers=headers)
@@ -99,14 +120,14 @@ class TwitterWebsiteSearch():
             # Check if is a tweet otherwise skip
             if 'data-item-id' not in li.attrs:
                 continue
-            
+            #TODO change id_str to integer reresentation id.
             tweet = {
                 'created_at' : None,
                 'id_str' : li['data-item-id'],
                 'text' : None,
                 'entities': {},
                 'user' : {
-                    'id_str' : None,
+                    'id_str' : None, 
                     'name' : None,
                     'screen_name': None,
                     'profile_image_url': None,
@@ -194,9 +215,14 @@ class TwitterWebsiteSearch():
             return tag[attr]
         return None
 
-def on_no_result try contu
+def t1():
+    tw = TwitterWebsiteSearch(0)
+    for result in tw.search_generator('$AAPL', '746423373266227200', '693141869211963392'):
+        print(result['request'].url)
 
 if __name__ == '__main__':
+    # t1()
+
     tw = TwitterWebsiteSearch(0)
     search_generator = tw.search_generator('$AAPL')
 
