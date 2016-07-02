@@ -3,16 +3,24 @@ from requests import Request, Session
 from time import sleep
 import time
 import lxml.html as lh
+from urllib.parse import quote
 
 base_url = 'https://twitter.com/i/search/timeline'
 
-def search(query, min_tweet_id=None, max_tweet_id=None, session=None):
+def search(query, min_tweet_id=None, max_tweet_id=None, aditional_params=None, session=None):
+    """
+    
+    """
+    # Init query parameters
+    params = {'q' : quote(query)}
+    if aditional_params is not None:
+        params = aditional_params
+        params['q'] = quote(query)        
 
     # Create Request
-    max_position = None
     if min_tweet_id is not None and max_tweet_id is not None:
-        max_position = encode_max_postion_param(min_tweet_id, max_tweet_id)
-    request = prepare_request(query, max_position)
+        params['max_position'] = encode_max_postion_param(min_tweet_id, max_tweet_id)
+    request = prepare_request(params)
 
     # Execute Request
     result = execute_request(request, session)
@@ -30,23 +38,20 @@ def search(query, min_tweet_id=None, max_tweet_id=None, session=None):
         'tweets': tweets
         }
 
-def prepare_request(query, max_position=None):
-    payload = { 'q' : query }
-    if max_position is not None:
-        payload['max_position'] = max_position
+def prepare_request(params):
+    payload_str = "&".join("%s=%s" % (k,v) for k,v in params.items())
     headers = {
         'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Ubuntu Chromium/29.0.1547.65 Chrome/29.0.1547.65 Safari/537.36',
         'Accept-Encoding' : 'gzip, deflate, sdch, br'
-    }
+        }
     cookie = {}
-    req = Request('GET', base_url, params=payload, headers=headers, cookies=cookie)
+    req = Request('GET', base_url, params=payload_str, headers=headers, cookies=cookie)
     return req.prepare()
 
-def execute_request(prepared_request, session):
+def execute_request(prepared_request, session=None):
     try:
         if session is None:
             session = Session()
-        
         result = session.send(prepared_request)
         return result
     except requests.exceptions.Timeout as e:
@@ -146,14 +151,16 @@ class TwitterPager():
                 error_delay=5,
                 timeout=5,
                 retry_limit=4,
-                continue_on_empty_result=True):
+                continue_on_empty_result=True,
+                session=Session()):
         self.rate_delay = rate_delay
         self.error_delay = error_delay
         self.timeout = timeout
         self.retry_limit = retry_limit
         self.continue_on_empty_result = continue_on_empty_result
+        self.session = session
 
-    def execute_request(prepared_request, session):
+    def execute_request(prepared_request, session=None):
         try:
             return execute_request(prepared_request, session)
         except requests.exceptions.Timeout as e:
@@ -162,9 +169,8 @@ class TwitterPager():
             sleep(self.error_delay)
             return self.execute_request(prepared_request)
 
-    def get_iterator(self, query, min_tweet_id=None, max_tweet_id=None):
-        session = Session()
-        result = search(query, min_tweet_id, max_tweet_id)
+    def get_iterator(self, query, min_tweet_id=None, max_tweet_id=None, aditional_params=None):
+        result = search(query, min_tweet_id, max_tweet_id, aditional_params)
         prev_min_tweet_id = None
         yield result
 
@@ -180,10 +186,7 @@ class TwitterPager():
                     int_min_id = int(min_tweet_id)
                     for x in range(8, len(min_tweet_id)):
                         min_to_try = int_min_id - 10**x
-                        max_position = encode_max_postion_param(str(min_to_try), max_tweet_id)
-                        request = prepare_request(base_url, query, max_position)
-                        result_json = self.execute_request(request, session)
-                        tweets = parse_tweets(result_json['items_html'])
+                        tweets = search(query, str(min_to_try), max_tweet_id, aditional_params)['tweets']
                         if len(tweets) > 0:
                             break
                     else:
@@ -202,13 +205,13 @@ class TwitterPager():
             if prev_min_tweet_id is min_tweet_id:
                 break
 
-            result = search(query, min_tweet_id, max_tweet_id, session)
+            result = search(query, min_tweet_id, max_tweet_id, aditional_params, self.session)
             
             yield result
 
 if __name__ == '__main__':
     count = 0
-    for x in TwitterPager().get_iterator('$AAPL'):
+    for x in TwitterPager().get_iterator('a b c "e" f OR g OR h -i -j -k #l OR #m OR #n lang:en'):
         print("{} {} {}".format(count, len(x['tweets']), x['_request'].url))
         count += 1
 
