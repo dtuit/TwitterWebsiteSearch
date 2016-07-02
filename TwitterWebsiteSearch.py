@@ -2,6 +2,7 @@ import requests
 from requests import Request, Session
 from time import sleep
 import time
+import lxml
 import lxml.html as lh
 from urllib.parse import quote
 
@@ -53,12 +54,16 @@ def execute_request(prepared_request, session=None):
         if session is None:
             session = Session()
         result = session.send(prepared_request)
+        print(prepared_request.url)
         return result
     except requests.exceptions.Timeout as e:
         raise
 
 def parse_tweets(items_html):
-    html = lh.fromstring(items_html)
+    try:
+        html = lh.fromstring(items_html)
+    except lxml.etree.ParserError as e:
+        return []
     tweets = []
     for li in html.cssselect('li.js-stream-item'):
         
@@ -184,14 +189,14 @@ class TwitterPager():
                     # Sometimes the API stops returning tweets even when there are more
                     # we can try to find these tweets by modifying the max_position parameter.
                     int_min_id = int(min_tweet_id)
-                    for x in range(8, len(min_tweet_id)):
+                    for x in range(8, len(min_tweet_id)): #TODO impl something more sophisticated 
                         min_to_try = int_min_id - 10**x
-                        tweets = search(query, str(min_to_try), max_tweet_id, aditional_params)['tweets']
-                        if len(tweets) > 0:
+                        result = search(query, str(min_to_try), max_tweet_id, aditional_params)
+                        if len(result['tweets']) > 0:
                             break
                     else:
                         print('No tweets returned terminating program')
-                        # if we didnt find any point to continue from break anyway.
+                        # if we didnt find any point to continue from, break.
                         break
 
             if max_tweet_id is None:
@@ -211,8 +216,8 @@ class TwitterPager():
 
 if __name__ == '__main__':
     count = 0
-    for x in TwitterPager().get_iterator('a b c "e" f OR g OR h -i -j -k #l OR #m OR #n lang:en'):
-        print("{} {} {}".format(count, len(x['tweets']), x['_request'].url))
+    for x in TwitterPager().get_iterator('a b c "e" f OR g OR h -i -j -k #l OR #m OR #n lang:en', '483272422016028672', '741824420763815937'):
+        # print("{} {} {}".format(count, len(x['tweets']), x['_request'].url))
         count += 1
 
         # if count == 20:
