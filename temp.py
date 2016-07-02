@@ -204,7 +204,7 @@ s2 = """<li class="js-stream-item stream-item stream-item
 
 
 </li>"""
-import TwitterWebsiteSearch2 
+from import TwitterWebsiteSearch2 
 from bs4 import BeautifulSoup, SoupStrainer 
 from contextlib import contextmanager
 import time
@@ -247,18 +247,16 @@ only_li_tags = SoupStrainer('li')
 
 parser = etree.HTMLParser()
 def parse_tweets(items_html):
-# for x in range(1,20):
-# with timeit_context('My profiling code'):
-    # tree = etree.parse(StringIO(s), parser)
-    # tree.cssselector()
-    
-    html = lh.fromstring(s) # 5ms
+    html = lh.fromstring(s)
     tweets = []
     for li in html.cssselect('li.js-stream-item'):
         
+        if 'data-item-id' not in li.attrib:
+            continue
+
         tweet = {
             'created_at' : None,
-            'id_str' : None,
+            'id_str' : li.get('data-item-id'),
             'text' : None,
             'entities': {
                 'hashtags': [],
@@ -276,7 +274,7 @@ def parse_tweets(items_html):
             'retweet_count' : 0,
             'favorite_count' : 0
         }
-
+        
         
         content_div = li.cssselect('div.tweet')
         if len(content_div) > 0:
@@ -294,10 +292,6 @@ def parse_tweets(items_html):
             text_p = text_p[0]
             tweet['text'] = text_p.text_content()
         
-        # header_section_div = content_div.cssselect('div.stream-item-header')
-        # if len(header_section_div) > 0:
-        #     header_section_div = header_section_div[0]
-        
         verified_span = content_div.cssselect('span.Icon--verified')
         if len(verified_span) > 0:
             tweet['user']['verified'] = True
@@ -305,22 +299,6 @@ def parse_tweets(items_html):
         date_span = content_div.cssselect('span._timestamp')
         if len(date_span) > 0:
             tweet['created_at'] = int(date_span[0].get('data-time-ms'))
-
-        # footer_section_div = content_div.cssselect('div.stream-item-footer')
-        # if len(footer_section_div) > 0:
-        #     footer_section_div = footer_section_div[0]
-
-        # counts_div = footer_section_div.cssselect('div.ProfileTweet-actionCountList')
-        # if len(counts_div) > 0:
-        #     counts_div = counts_div[0]
-        
-        # retweet_span = li.cssselect('span.ProfileTweet-action--retweet > span.ProfileTweet-actionCount')
-        # if len(retweet_span) > 0:
-        #     tweet['retweet_count'] = int(retweet_span[0].get('data-tweet-stat-count'))
-            
-        # fav_span = li.cssselect("span.ProfileTweet-action--favorite > span.ProfileTweet-actionCount")
-        # if len(fav_span) > 0:
-        #     tweet['favorite_count'] = int(retweet_span[0].get('data-tweet-stat-count'))
         
         counts = li.cssselect('span.ProfileTweet-action--retweet, span.ProfileTweet-action--favorite')
         if len(counts) > 0:
@@ -349,17 +327,22 @@ def parse_tweets(items_html):
                     display_url = tag.cssselect('span.js-display-url')
                     if len(display_url) > 0:
                         url['display_url'] = display_url[0].text_content()
-                    entities['urls'].append(url)   
-
-        # print(tweet)
+                    entities['urls'].append(url)
         
-
-# print(soup.prettify())
-# group = soup.find_all('a', class_="account-group")
-# print('s')
+        tweets.append(tweet)
+    return tweets
 
 for i in range(1, 100):
     with timeit_context('My profiling code'):
         parse_tweets(s)
 
 print(mean(timings))
+timings = []
+
+for i in range(1, 100):
+    with timeit_context('My profiling code'):
+        TwitterWebsiteSearch2.parse_tweets(s)
+
+print(mean(timings))
+timings = []
+

@@ -1,6 +1,7 @@
 *~
 __pycache__
 .vscode
+*.pyc
 
 keys.json
 output*.txt
