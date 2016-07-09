@@ -310,6 +310,8 @@ class TwitterPager():
             if max_tweet_id is None:
                 max_tweet_id = result['tweets'][1]['id_str']
             
+            # In a high volume search query like 'a' must use the max_tweet_id provided by the result,
+            # otherwise the same results will be returned many times. (only happens during the first ~10 pages of results)
             res_min_pos = result['_result_json'].get('min_position')
             if res_min_pos is not None:
                 split = res_min_pos.split('-')
