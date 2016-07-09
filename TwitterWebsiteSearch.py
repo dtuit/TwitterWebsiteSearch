@@ -1,6 +1,6 @@
 import requests
 from requests import Request, Session
-# import time
+from datetime import datetime 
 from time import sleep
 import lxml
 import lxml.html as lh
@@ -121,7 +121,7 @@ def _parse_tweet(tweetElement):
     
     date_span = content_div.cssselect('span._timestamp')
     if len(date_span) > 0:
-        tweet['created_at'] = int(date_span[0].get('data-time-ms'))
+        tweet['created_at'] = datetime.utcfromtimestamp(int(date_span[0].get('data-time-ms'))/1000)
     
     counts = li.cssselect('span.ProfileTweet-action--retweet, span.ProfileTweet-action--favorite')
     if len(counts) > 0:

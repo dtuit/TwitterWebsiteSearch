@@ -8,7 +8,7 @@ Tweets extracted, are formatted similarly to the official API, detailed [here](h
 each tweet is a python dict with the following structure.
 ```
 {
-	'created_at' : UTC-UNIX-timestamp,
+	'created_at' : UTC-datetime,
 	'id_str' : "",
 	'text' : "",
 	'entities': {
@@ -25,7 +25,8 @@ each tweet is a python dict with the following structure.
 		'verified': bool
 		},
 	'retweet_count' : 0,
-	'favorite_count' : 0
+	'favorite_count' : 0,
+	''
 }
 ```
 ##Usage
