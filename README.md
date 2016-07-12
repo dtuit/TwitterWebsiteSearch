@@ -35,7 +35,7 @@ each tweet is a python dict with the following structure.
 }
 ```
 ##Usage
-create your query using [twitter advanced search](https://twitter.com/search-advanced)
+create your query using [twitter advanced search](https://twitter.com/search-advanced)  
 note: pass the query without url encoding.
 ```python
 
