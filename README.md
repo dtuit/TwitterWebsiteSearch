@@ -1,6 +1,6 @@
 #TwitterWebsiteSearch 
 
-TwitterWebsiteSearch is a small python library for searching and saving data from [Twitter.com search](https://twitter.com/search-home) without using the [official API](https://dev.twitter.com/rest/public/search). 
+TwitterWebsiteSearch is a small python script for searching and saving data from [Twitter.com search](https://twitter.com/search-home) without using the [official API](https://dev.twitter.com/rest/public/search). 
 
 ##Data Format
 Tweets extracted, are formatted similarly to the official API, detailed [here](https://dev.twitter.com/overview/api/tweets)
@@ -8,7 +8,7 @@ Tweets extracted, are formatted similarly to the official API, detailed [here](h
 each tweet is a python dict with the following structure.
 ```
 {
-	'created_at' : UTC-datetime,
+	'created_at' : UTC-datetime format '%Y-%m-%d %H:%M:%S' ,
 	'id_str' : "",
 	'text' : "",
 	'entities': {
@@ -16,6 +16,7 @@ each tweet is a python dict with the following structure.
 		'symbols':[],
 		'user_mentions':[],
 		'urls':[],
+		'media'[] optional
 		},
 	'user' : {
 		'id_str' : "",
@@ -26,25 +27,32 @@ each tweet is a python dict with the following structure.
 		},
 	'retweet_count' : 0,
 	'favorite_count' : 0,
-	''
+	'is_quote_status' : False,
+	'in_reply_to_user_id': None,
+	'in_reply_to_screen_name' : None,
+	'contains_photo': False,
+	'contains_video': False
 }
 ```
 ##Usage
 create your query using [twitter advanced search](https://twitter.com/search-advanced)
 ```python
 
-	tw = TwitterWebsiteSearch(0)
-	search_generator = tw.search_generator('YOUR_QUERY')
-	
-	for result in search_generator:
-	    count = 0
-	    for tweet in result['tweets']:
-	        count += 1
-	        print("{0} id: {1} text: {2}".format(count, tweet['id_str'], tweet['text']))
-		
+	import TwitterWebsiteSearch
+
+	TitterPageIterator = TwitterWebsiteSearch.TwitterPager().get_iterator('#python')
+
+	count = 0
+	for page in TitterPageIterator:
+		for tweet in page['tweets']:
+			print("{0} id: {1} text: {2}".format(count, tweet['id_str'], tweet['text']))
+			count += 1
 ```
 
 ###Dependencies 
 
 * [requests](http://docs.python-requests.org)
-* [beautifulsoup4](https://www.crummy.com/software/BeautifulSoup/)
+* [lxml](http://lxml.de/index.html)
+* [cssselect](https://pythonhosted.org/cssselect/)
+
+note. using lmxl directly instead of BeautifulSoup as BS was too slow.
