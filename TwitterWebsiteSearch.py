@@ -241,7 +241,7 @@ def _parse_tweet_media(element, media):
 
 def parse_tweets(items_html):
     try:
-        html = lh.fromstring(items_html)
+        html = lh.fromstring(items_html.encode('unicode-escape'))
     except lxml.etree.ParserError as e:
         return []
     tweets = []
