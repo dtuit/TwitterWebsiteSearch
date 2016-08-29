@@ -112,7 +112,13 @@ def _parse_tweet(tweetElement):
     text_p = content_div.cssselect('p.tweet-text')
     if len(text_p) > 0:
         text_p = text_p[0]
-        tweet['text'] = text_p.text_content()
+        
+        #hacky way to include Emojis
+        for item in text_p.cssselect('img.Emoji'):
+            item.tail = item.get('alt') + item.tail if item.tail else item.get('alt')
+        
+        #remove non breaking space and ellipsis
+        tweet['text'] = text_p.text_content().replace(u"\xa0", u"").replace(u'\u2026', u"")
         tweet['lang'] = text_p.get('lang')
     
     verified_span = content_div.cssselect('span.Icon--verified')
@@ -123,6 +129,7 @@ def _parse_tweet(tweetElement):
     if len(date_span) > 0:
         tweet['created_at'] = datetime.utcfromtimestamp(int(date_span[0].get('data-time-ms'))/1000).strftime('%Y-%m-%d %H:%M:%S') 
     
+    #Retweet and Favoritte counts
     counts = li.cssselect('span.ProfileTweet-action--retweet, span.ProfileTweet-action--favorite')
     if len(counts) > 0:
         for c in counts:
@@ -333,12 +340,16 @@ class TwitterPager():
 def inorder(tweets):
     tweets_sorted = sorted(tweets, key=itemgetter('id_str')) 
 
-if __name__ == '__main__':
+def test2():
+    res = search('#AAPL', '683221052726460416', '758682719219920897')
+    print(res)
+
+def test():
     with open('output.txt', 'w') as f:
         f.close()
     import json
     count = 0
-    for x in TwitterPager().get_iterator('a'):
+    for x in TwitterPager().get_iterator('emoji'):
         with open('output.txt', 'a') as f:
             reses = []
             for t in x['tweets']:
@@ -349,5 +360,6 @@ if __name__ == '__main__':
             # f.write(json.dumps(x['tweets'], indent=4))
             count += 1
 
-            if count == 5:
-                break
+if __name__ == '__main__':
+    test2()
+    
