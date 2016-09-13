@@ -25,7 +25,6 @@ def search(query, min_tweet_id=None, max_tweet_id=None, aditional_params=None, s
         params['max_position'] = encode_max_postion_param(min_tweet_id, max_tweet_id)
     request = prepare_request(params)
 
-    # Execute Request
     result = execute_request(request, session)
     result_json = result.json()
 
@@ -34,7 +33,6 @@ def search(query, min_tweet_id=None, max_tweet_id=None, aditional_params=None, s
     if result_json is not None and result_json['items_html'] is not None:
         tweets = parse_tweets(result_json['items_html']) 
 
-    # Return Result
     return {
         '_request': request,
         '_result': result,
@@ -52,6 +50,7 @@ def prepare_request(params):
     req = Request('GET', base_url, params=payload_str, headers=headers, cookies=cookie)
     return req.prepare()
 
+@timing
 def execute_request(prepared_request, session=None):
     try:
         if session is None:
@@ -245,7 +244,6 @@ def _parse_tweet_entites(element, entities):
 def _parse_tweet_media(element, media):
     pass
 
-
 def parse_tweets(items_html):
     try:
         html = lh.fromstring(items_html)
@@ -289,8 +287,17 @@ class TwitterPager():
             sleep(self.error_delay)
             return self.execute_request(prepared_request)
 
+    def _search(self, query, min_tweet_id=None, max_tweet_id=None, aditional_params=None):
+        try:
+            return search(query, min_tweet_id, max_tweet_id, aditional_params, self.session)
+        except requests.exceptions.Timeout as e:
+            print(e.message)
+            print("Sleeping for {:d}".format(self.error_delay))
+            sleep(self.error_delay)
+            return self.execute_request(prepared_request)
+
     def get_iterator(self, query, min_tweet_id=None, max_tweet_id=None, aditional_params=None):
-        result = search(query, min_tweet_id, max_tweet_id, aditional_params)
+        result = self._search(query, min_tweet_id, max_tweet_id, aditional_params)
         prev_min_tweet_id = None
         yield result
 
@@ -344,6 +351,13 @@ def test2():
     res = search('#AAPL', '683221052726460416', '758682719219920897')
     print(res)
 
+def test3():
+    res = search('$AAPL', None, None)
+    print(len(res['tweets']))
+
+def test4():
+    for res in TwitterPager().get_iterator('$AAPL'):
+        print(len(res['tweets']))
 def test():
     with open('output.txt', 'w') as f:
         f.close()
@@ -361,5 +375,5 @@ def test():
             count += 1
 
 if __name__ == '__main__':
-    test2()
+    test4()
     
