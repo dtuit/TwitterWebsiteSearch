@@ -1,120 +1,120 @@
 {
-  "created_at": "Fri Aug 26 05:26:47 +0000 2016",
-  "id": 769043391917199400,
-  "id_str": "769043391917199360",
-  "text": "9 sichere Anzeichen dafür, dass du einer richtigen Beziehung bist – ☼ ✿ ☺ Informationen und Inspir... https://t.co/Kxclo0PGYT",
-  "truncated": false,
-  "entities":  {
-    "hashtags":  [],
-    "symbols":  [],
-    "user_mentions":  [],
-    "urls":  [
-       {
-        "url": "https://t.co/Kxclo0PGYT",
-        "expanded_url": "https://willibald66.wordpress.com/2016/08/26/9-sichere-anzeichen-dafuer-dass-du-einer-richtigen-beziehung-bist-%e2%98%bc-%e2%9c%bf-%e2%98%ba-informationen-und-inspirationen-fuer-ein-bewusstes-veganes-und-frohes-leben-%e2%98%ba-%e2%9c%bf",
-        "display_url": "willibald66.wordpress.com/2016/08/26/9-s…",
-        "indices":  [
-          102,
-          125
-        ]
-      }
-    ]
-  },
-  "source": "<a href="http://www.networkedblogs.com/" rel="nofollow">NetworkedBlogs</a>",
-  "in_reply_to_status_id": null,
-  "in_reply_to_status_id_str": null,
-  "in_reply_to_user_id": null,
-  "in_reply_to_user_id_str": null,
-  "in_reply_to_screen_name": null,
-  "user":  {
-    "id": 46415111,
-    "id_str": "46415111",
-    "name": "Heinz Badura",
-    "screen_name": "willibald66",
-    "location": "Querfurt,Germany",
-    "description": "Ich bin Webmaster bei Website-Marketing,\r\nSeiten http://t.co/YOlzXzcmZ0\r\nhttp://t.co/Z0x06bRZSa",
-    "url": "http://t.co/6tMoxZ4B4X",
-    "entities":  {
-      "url":  {
-        "urls":  [
-           {
-            "url": "http://t.co/6tMoxZ4B4X",
-            "expanded_url": "http://www.website-marketing24.com",
-            "display_url": "website-marketing24.com",
-            "indices":  [
-              0,
-              22
-            ]
-          }
-        ]
-      },
-      "description":  {
-        "urls":  [
-           {
-            "url": "http://t.co/YOlzXzcmZ0",
-            "expanded_url": "http://wefollow.com/willibald66",
-            "display_url": "wefollow.com/willibald66",
-            "indices":  [
-              49,
-              71
-            ]
-          },
-           {
-            "url": "http://t.co/Z0x06bRZSa",
-            "expanded_url": "http://willibald66.wordpress.com/",
-            "display_url": "willibald66.wordpress.com",
-            "indices":  [
-              73,
-              95
-            ]
-          }
-        ]
-      }
+    "contributors": null,
+    "coordinates": null,
+    "created_at": "Fri Aug 26 05:26:47 +0000 2016",
+    "entities": {
+        "hashtags": [],
+        "symbols": [],
+        "urls": [
+            {
+                "display_url": "willibald66.wordpress.com/2016/08/26/9-s…",
+                "expanded_url": "https://willibald66.wordpress.com/2016/08/26/9-sichere-anzeichen-dafuer-dass-du-einer-richtigen-beziehung-bist-%e2%98%bc-%e2%9c%bf-%e2%98%ba-informationen-und-inspirationen-fuer-ein-bewusstes-veganes-und-frohes-leben-%e2%98%ba-%e2%9c%bf",
+                "indices": [
+                    102,
+                    125
+                ],
+                "url": "https://t.co/Kxclo0PGYT"
+            }
+        ],
+        "user_mentions": []
     },
-    "protected": false,
-    "followers_count": 4783,
-    "friends_count": 5092,
-    "listed_count": 103,
-    "created_at": "Thu Jun 11 15:46:25 +0000 2009",
-    "favourites_count": 0,
-    "utc_offset": 7200,
-    "time_zone": "Berlin",
-    "geo_enabled": true,
-    "verified": false,
-    "statuses_count": 80637,
+    "favorite_count": 0,
+    "favorited": false,
+    "geo": null,
+    "id": 769043391917199360,
+    "id_str": "769043391917199360",
+    "in_reply_to_screen_name": null,
+    "in_reply_to_status_id": null,
+    "in_reply_to_status_id_str": null,
+    "in_reply_to_user_id": null,
+    "in_reply_to_user_id_str": null,
+    "is_quote_status": false,
     "lang": "de",
-    "contributors_enabled": false,
-    "is_translator": false,
-    "is_translation_enabled": false,
-    "profile_background_color": "8B542B",
-    "profile_background_image_url": "http://pbs.twimg.com/profile_background_images/122029089/Burg_und_Stadt_1_.jpg",
-    "profile_background_image_url_https": "https://pbs.twimg.com/profile_background_images/122029089/Burg_und_Stadt_1_.jpg",
-    "profile_background_tile": false,
-    "profile_image_url": "http://pbs.twimg.com/profile_images/650304472523083776/fjatzIKB_normal.jpg",
-    "profile_image_url_https": "https://pbs.twimg.com/profile_images/650304472523083776/fjatzIKB_normal.jpg",
-    "profile_banner_url": "https://pbs.twimg.com/profile_banners/46415111/1443888295",
-    "profile_link_color": "9D582E",
-    "profile_sidebar_border_color": "D9B17E",
-    "profile_sidebar_fill_color": "EADEAA",
-    "profile_text_color": "333333",
-    "profile_use_background_image": true,
-    "has_extended_profile": false,
-    "default_profile": false,
-    "default_profile_image": false,
-    "following": false,
-    "follow_request_sent": false,
-    "notifications": false
-  },
-  "geo": null,
-  "coordinates": null,
-  "place": null,
-  "contributors": null,
-  "is_quote_status": false,
-  "retweet_count": 0,
-  "favorite_count": 0,
-  "favorited": false,
-  "retweeted": false,
-  "possibly_sensitive": false,
-  "possibly_sensitive_appealable": false,
-  "lang": "de"
+    "place": null,
+    "possibly_sensitive": false,
+    "possibly_sensitive_appealable": false,
+    "retweet_count": 0,
+    "retweeted": false,
+    "source": "<a href=\"http://www.networkedblogs.com/\" rel=\"nofollow\">NetworkedBlogs</a>",
+    "text": "9 sichere Anzeichen dafür, dass du einer richtigen Beziehung bist – ☼ ✿ ☺ Informationen und Inspir... https://t.co/Kxclo0PGYT",
+    "truncated": false,
+    "user": {
+        "contributors_enabled": false,
+        "created_at": "Thu Jun 11 15:46:25 +0000 2009",
+        "default_profile": false,
+        "default_profile_image": false,
+        "description": "Ich bin Webmaster bei Website-Marketing,\r\nSeiten http://t.co/YOlzXzcmZ0\r\nhttp://t.co/Z0x06bRZSa",
+        "entities": {
+            "description": {
+                "urls": [
+                    {
+                        "display_url": "wefollow.com/willibald66",
+                        "expanded_url": "http://wefollow.com/willibald66",
+                        "indices": [
+                            49,
+                            71
+                        ],
+                        "url": "http://t.co/YOlzXzcmZ0"
+                    },
+                    {
+                        "display_url": "willibald66.wordpress.com",
+                        "expanded_url": "http://willibald66.wordpress.com/",
+                        "indices": [
+                            73,
+                            95
+                        ],
+                        "url": "http://t.co/Z0x06bRZSa"
+                    }
+                ]
+            },
+            "url": {
+                "urls": [
+                    {
+                        "display_url": "website-marketing24.com",
+                        "expanded_url": "http://www.website-marketing24.com",
+                        "indices": [
+                            0,
+                            22
+                        ],
+                        "url": "http://t.co/6tMoxZ4B4X"
+                    }
+                ]
+            }
+        },
+        "favourites_count": 0,
+        "follow_request_sent": false,
+        "followers_count": 4777,
+        "following": false,
+        "friends_count": 5107,
+        "geo_enabled": true,
+        "has_extended_profile": false,
+        "id": 46415111,
+        "id_str": "46415111",
+        "is_translation_enabled": false,
+        "is_translator": false,
+        "lang": "de",
+        "listed_count": 102,
+        "location": "Querfurt,Germany",
+        "name": "Heinz Badura",
+        "notifications": false,
+        "profile_background_color": "8B542B",
+        "profile_background_image_url": "http://pbs.twimg.com/profile_background_images/122029089/Burg_und_Stadt_1_.jpg",
+        "profile_background_image_url_https": "https://pbs.twimg.com/profile_background_images/122029089/Burg_und_Stadt_1_.jpg",
+        "profile_background_tile": false,
+        "profile_banner_url": "https://pbs.twimg.com/profile_banners/46415111/1443888295",
+        "profile_image_url": "http://pbs.twimg.com/profile_images/650304472523083776/fjatzIKB_normal.jpg",
+        "profile_image_url_https": "https://pbs.twimg.com/profile_images/650304472523083776/fjatzIKB_normal.jpg",
+        "profile_link_color": "9D582E",
+        "profile_sidebar_border_color": "D9B17E",
+        "profile_sidebar_fill_color": "EADEAA",
+        "profile_text_color": "333333",
+        "profile_use_background_image": true,
+        "protected": false,
+        "screen_name": "willibald66",
+        "statuses_count": 82554,
+        "time_zone": "Berlin",
+        "url": "http://t.co/6tMoxZ4B4X",
+        "utc_offset": 7200,
+        "verified": false
+    }
 }

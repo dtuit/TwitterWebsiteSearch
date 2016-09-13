@@ -4,24 +4,25 @@ from requests.packages.urllib3.util import Retry
 from requests.adapters import HTTPAdapter
 from datetime import datetime, timezone
 from time import sleep
+import pytz
 import lxml
 import lxml.html as lh
 from urllib.parse import quote, urlsplit
 import re
 from operator import itemgetter
 
-import logging
-logging.basicConfig(level=logging.DEBUG)
+# import logging
+# logging.basicConfig(level=logging.DEBUG)
 
-import time
-def timing(f):
-    def wrap(*args):
-        time1 = time.time()
-        ret = f(*args)
-        time2 = time.time()
-        print("{} function took {:0.3f} ms".format(f.__name__, (time2-time1)*1000.0))
-        return ret
-    return wrap
+# import time
+# def timing(f):
+#     def wrap(*args):
+#         time1 = time.time()
+#         ret = f(*args)
+#         time2 = time.time()
+#         print("{} function took {:0.3f} ms".format(f.__name__, (time2-time1)*1000.0))
+#         return ret
+#     return wrap
 
 
 class TwitterClient():
@@ -53,7 +54,6 @@ class TwitterClient():
         self.search_url = 'https://twitter.com/i/search/timeline'
         self.user_url = 'https://twitter.com/i/profiles/show/{username}/timeline/tweets'
 
-    @timing    
     def search_query(self, query, min_tweet_id, max_tweet_id, additional_params=None):
         # Init query parameters
         params = {'q' : quote(query)}
@@ -130,7 +130,7 @@ class TwitterClient():
             result = self.search_query(query, min_tweet_id, max_tweet_id, additional_params)
             
             yield result
-    @timing
+
     def _execute_request(self, prepared_request):
         try:
             result = self.session.send(prepared_request, timeout=self.timeout)
@@ -148,7 +148,6 @@ class TwitterClient():
     def _encode_max_postion_param(self, min, max):
         return "TWEET-{0}-{1}".format(min, max)
 
-    @timing
     def parse_tweets(self, items_html):
         try:
             html = lh.fromstring(items_html)
@@ -229,8 +228,9 @@ class TwitterClient():
         
         date_span = content_div.cssselect('span._timestamp')
         if len(date_span) > 0:
-            tweet['created_at'] = datetime.utcfromtimestamp(int(date_span[0].get('data-time-ms'))/1000).strftime('%Y-%m-%d %H:%M:%S') 
-        
+            timestamp = int(date_span[0].get('data-time-ms'))/1000
+            tweet['created_at'] = datetime.fromtimestamp(timestamp, tz=pytz.utc).strftime('%a %b %d %H:%M:%S %z %Y') 
+        tzinfo=datetime.timezone.utc
         #Retweet and Favoritte counts
         counts = li.cssselect('span.ProfileTweet-action--retweet, span.ProfileTweet-action--favorite')
         if len(counts) > 0:
@@ -308,10 +308,10 @@ class TwitterClient():
                     tweet['entities']['media'].append(video)
             # print(tweet['entities']['media'])
 
-        else:
-            tweet_media_context = content_div.cssselect('div.card2')
-            if len(tweet_media_context) > 0:
-                pass
+        # else:
+        #     tweet_media_context = content_div.cssselect('div.card2')
+        #     if len(tweet_media_context) > 0:
+        #         pass
 
         return tweet
 
@@ -321,16 +321,16 @@ class TwitterClient():
             for tag in tags:
                 classes = tag.get('class').split(' ')
                 if 'twitter-hashtag'in classes:
-                    entities['hashtags'].append(tag.text_content()) #remove # symbol
+                    entities['hashtags'].append(tag.text_content()) #TODO remove # symbol
                 elif 'twitter-cashtag' in classes:
-                    entities['symbols'].append(tag.text_content()) #remove $ symbol
+                    entities['symbols'].append(tag.text_content()) #TODO remove $ symbol
                 elif 'twitter-atreply' in classes:
                     mentioned_user = {
                         'id_str' : tag.get('data-mentioned-user-id'),
-                        'screen_name' : tag.text_content() #remove @ symbol
+                        'screen_name' : tag.text_content() #TODO remove @ symbol
                     }
                     entities['user_mentions'].append(mentioned_user)
-                elif 'twitter-timeline-link' in classes: # and 'u-hidden' not in classes
+                elif 'twitter-timeline-link' in classes: #TODO and 'u-hidden' not in classes
                     url = {
                         'url': tag.get('href'),
                         'expanded_url' : tag.get('data-expanded-url'),

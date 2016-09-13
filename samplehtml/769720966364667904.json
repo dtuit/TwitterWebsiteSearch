@@ -1,107 +1,107 @@
 {
-  "created_at": "Sun Aug 28 02:19:13 +0000 2016",
-  "id": 769720966364667900,
-  "id_str": "769720966364667904",
-  "text": "The final: #Mets 12, Phillies 1\nThe star: Asdrubal Cabrera\nThe streak: W3\nThe record: 66-63\nThe 162-game pace: 83-79\nThe emoji: 🔨📈",
-  "truncated": false,
-  "entities":  {
-    "hashtags":  [
-       {
-        "text": "Mets",
-        "indices":  [
-          11,
-          16
-        ]
-      }
-    ],
-    "symbols":  [],
-    "user_mentions":  [],
-    "urls":  []
-  },
-  "source": "<a href="http://twitter.com/download/android" rel="nofollow">Twitter for Android</a>",
-  "in_reply_to_status_id": null,
-  "in_reply_to_status_id_str": null,
-  "in_reply_to_user_id": null,
-  "in_reply_to_user_id_str": null,
-  "in_reply_to_screen_name": null,
-  "user":  {
-    "id": 56855530,
-    "id_str": "56855530",
-    "name": "Anthony DiComo",
-    "screen_name": "AnthonyDiComo",
-    "location": "New York, NY",
-    "description": "Mets beat writer for http://t.co/T19zmz5HyG.",
-    "url": "http://t.co/WYULbGrDLV",
-    "entities":  {
-      "url":  {
-        "urls":  [
-           {
-            "url": "http://t.co/WYULbGrDLV",
-            "expanded_url": "http://www.mlb.com",
-            "display_url": "mlb.com",
-            "indices":  [
-              0,
-              22
-            ]
-          }
-        ]
-      },
-      "description":  {
-        "urls":  [
-           {
-            "url": "http://t.co/T19zmz5HyG",
-            "expanded_url": "http://MLB.com",
-            "display_url": "MLB.com",
-            "indices":  [
-              21,
-              43
-            ]
-          }
-        ]
-      }
+    "contributors": null,
+    "coordinates": null,
+    "created_at": "Sun Aug 28 02:19:13 +0000 2016",
+    "entities": {
+        "hashtags": [
+            {
+                "indices": [
+                    11,
+                    16
+                ],
+                "text": "Mets"
+            }
+        ],
+        "symbols": [],
+        "urls": [],
+        "user_mentions": []
     },
-    "protected": false,
-    "followers_count": 40684,
-    "friends_count": 366,
-    "listed_count": 1940,
-    "created_at": "Tue Jul 14 23:36:34 +0000 2009",
-    "favourites_count": 291,
-    "utc_offset": -14400,
-    "time_zone": "Eastern Time (US & Canada)",
-    "geo_enabled": false,
-    "verified": true,
-    "statuses_count": 34749,
+    "favorite_count": 227,
+    "favorited": false,
+    "geo": null,
+    "id": 769720966364667904,
+    "id_str": "769720966364667904",
+    "in_reply_to_screen_name": null,
+    "in_reply_to_status_id": null,
+    "in_reply_to_status_id_str": null,
+    "in_reply_to_user_id": null,
+    "in_reply_to_user_id_str": null,
+    "is_quote_status": false,
     "lang": "en",
-    "contributors_enabled": false,
-    "is_translator": false,
-    "is_translation_enabled": false,
-    "profile_background_color": "09052E",
-    "profile_background_image_url": "http://pbs.twimg.com/profile_background_images/233323218/dicomotwitter.jpg",
-    "profile_background_image_url_https": "https://pbs.twimg.com/profile_background_images/233323218/dicomotwitter.jpg",
-    "profile_background_tile": false,
-    "profile_image_url": "http://pbs.twimg.com/profile_images/581638186914418690/74ZUPryv_normal.png",
-    "profile_image_url_https": "https://pbs.twimg.com/profile_images/581638186914418690/74ZUPryv_normal.png",
-    "profile_banner_url": "https://pbs.twimg.com/profile_banners/56855530/1427495654",
-    "profile_link_color": "0084B4",
-    "profile_sidebar_border_color": "BDDCAD",
-    "profile_sidebar_fill_color": "EEEDFF",
-    "profile_text_color": "333333",
-    "profile_use_background_image": true,
-    "has_extended_profile": false,
-    "default_profile": false,
-    "default_profile_image": false,
-    "following": false,
-    "follow_request_sent": false,
-    "notifications": false
-  },
-  "geo": null,
-  "coordinates": null,
-  "place": null,
-  "contributors": null,
-  "is_quote_status": false,
-  "retweet_count": 54,
-  "favorite_count": 196,
-  "favorited": false,
-  "retweeted": false,
-  "lang": "en"
+    "place": null,
+    "retweet_count": 56,
+    "retweeted": false,
+    "source": "<a href=\"http://twitter.com/download/android\" rel=\"nofollow\">Twitter for Android</a>",
+    "text": "The final: #Mets 12, Phillies 1\nThe star: Asdrubal Cabrera\nThe streak: W3\nThe record: 66-63\nThe 162-game pace: 83-79\nThe emoji: 🔨📈",
+    "truncated": false,
+    "user": {
+        "contributors_enabled": false,
+        "created_at": "Tue Jul 14 23:36:34 +0000 2009",
+        "default_profile": false,
+        "default_profile_image": false,
+        "description": "Mets beat writer for http://t.co/T19zmz5HyG.",
+        "entities": {
+            "description": {
+                "urls": [
+                    {
+                        "display_url": "MLB.com",
+                        "expanded_url": "http://MLB.com",
+                        "indices": [
+                            21,
+                            43
+                        ],
+                        "url": "http://t.co/T19zmz5HyG"
+                    }
+                ]
+            },
+            "url": {
+                "urls": [
+                    {
+                        "display_url": "mlb.com",
+                        "expanded_url": "http://www.mlb.com",
+                        "indices": [
+                            0,
+                            22
+                        ],
+                        "url": "http://t.co/WYULbGrDLV"
+                    }
+                ]
+            }
+        },
+        "favourites_count": 297,
+        "follow_request_sent": false,
+        "followers_count": 41148,
+        "following": false,
+        "friends_count": 371,
+        "geo_enabled": false,
+        "has_extended_profile": false,
+        "id": 56855530,
+        "id_str": "56855530",
+        "is_translation_enabled": false,
+        "is_translator": false,
+        "lang": "en",
+        "listed_count": 1955,
+        "location": "New York, NY",
+        "name": "Anthony DiComo",
+        "notifications": false,
+        "profile_background_color": "09052E",
+        "profile_background_image_url": "http://pbs.twimg.com/profile_background_images/233323218/dicomotwitter.jpg",
+        "profile_background_image_url_https": "https://pbs.twimg.com/profile_background_images/233323218/dicomotwitter.jpg",
+        "profile_background_tile": false,
+        "profile_banner_url": "https://pbs.twimg.com/profile_banners/56855530/1427495654",
+        "profile_image_url": "http://pbs.twimg.com/profile_images/581638186914418690/74ZUPryv_normal.png",
+        "profile_image_url_https": "https://pbs.twimg.com/profile_images/581638186914418690/74ZUPryv_normal.png",
+        "profile_link_color": "0084B4",
+        "profile_sidebar_border_color": "BDDCAD",
+        "profile_sidebar_fill_color": "EEEDFF",
+        "profile_text_color": "333333",
+        "profile_use_background_image": true,
+        "protected": false,
+        "screen_name": "AnthonyDiComo",
+        "statuses_count": 35236,
+        "time_zone": "Eastern Time (US & Canada)",
+        "url": "http://t.co/WYULbGrDLV",
+        "utc_offset": -14400,
+        "verified": true
+    }
 }
