@@ -1,0 +1,145 @@
+{
+    "contributors": null,
+    "coordinates": null,
+    "created_at": "Thu Jan 24 21:40:53 +0000 2013",
+    "entities": {
+        "hashtags": [
+            {
+                "indices": [
+                    52,
+                    58
+                ],
+                "text": "apple"
+            },
+            {
+                "indices": [
+                    59,
+                    64
+                ],
+                "text": "aapl"
+            }
+        ],
+        "symbols": [
+            {
+                "indices": [
+                    71,
+                    76
+                ],
+                "text": "aapl"
+            }
+        ],
+        "urls": [
+            {
+                "display_url": "money.cnn.com/2013/01/24/inv…",
+                "expanded_url": "http://money.cnn.com/2013/01/24/investing/apple-stock/index.html",
+                "indices": [
+                    24,
+                    44
+                ],
+                "url": "http://t.co/Yo3oCb0B"
+            }
+        ],
+        "user_mentions": [
+            {
+                "id": 380749300,
+                "id_str": "380749300",
+                "indices": [
+                    45,
+                    51
+                ],
+                "name": "Apple",
+                "screen_name": "Apple"
+            },
+            {
+                "id": 735185995,
+                "id_str": "735185995",
+                "indices": [
+                    65,
+                    70
+                ],
+                "name": "AAPL",
+                "screen_name": "aapl"
+            }
+        ]
+    },
+    "favorite_count": 0,
+    "favorited": false,
+    "geo": null,
+    "id": 294560429865320448,
+    "id_str": "294560429865320448",
+    "in_reply_to_screen_name": "Apple",
+    "in_reply_to_status_id": null,
+    "in_reply_to_status_id_str": null,
+    "in_reply_to_user_id": 380749300,
+    "in_reply_to_user_id_str": "380749300",
+    "is_quote_status": false,
+    "lang": "en",
+    "place": null,
+    "possibly_sensitive": false,
+    "possibly_sensitive_appealable": false,
+    "retweet_count": 0,
+    "retweeted": false,
+    "source": "<a href=\"http://twitter.com/download/android\" rel=\"nofollow\">Twitter for Android</a>",
+    "text": "Apple stock plunges 12%\nhttp://t.co/Yo3oCb0B\n@apple #apple #aapl @aapl $aapl",
+    "truncated": false,
+    "user": {
+        "contributors_enabled": false,
+        "created_at": "Sat Mar 19 05:19:09 +0000 2011",
+        "default_profile": false,
+        "default_profile_image": false,
+        "description": "Today's daydream will be tomorrow's dreamday. Founder & chairman of @SaifMeGroup and President and founder of @eve_noon",
+        "entities": {
+            "description": {
+                "urls": []
+            },
+            "url": {
+                "urls": [
+                    {
+                        "display_url": "saifme.co",
+                        "expanded_url": "http://saifme.co",
+                        "indices": [
+                            0,
+                            23
+                        ],
+                        "url": "https://t.co/DWQoagPmdM"
+                    }
+                ]
+            }
+        },
+        "favourites_count": 274,
+        "follow_request_sent": false,
+        "followers_count": 77,
+        "following": false,
+        "friends_count": 479,
+        "geo_enabled": true,
+        "has_extended_profile": false,
+        "id": 268642550,
+        "id_str": "268642550",
+        "is_translation_enabled": false,
+        "is_translator": false,
+        "lang": "en",
+        "listed_count": 1,
+        "location": "",
+        "name": "Saif",
+        "notifications": false,
+        "profile_background_color": "131516",
+        "profile_background_image_url": "http://abs.twimg.com/images/themes/theme14/bg.gif",
+        "profile_background_image_url_https": "https://abs.twimg.com/images/themes/theme14/bg.gif",
+        "profile_background_tile": true,
+        "profile_banner_url": "https://pbs.twimg.com/profile_banners/268642550/1458559264",
+        "profile_image_url": "http://pbs.twimg.com/profile_images/1278916560/image_normal.jpg",
+        "profile_image_url_https": "https://pbs.twimg.com/profile_images/1278916560/image_normal.jpg",
+        "profile_link_color": "009999",
+        "profile_sidebar_border_color": "EEEEEE",
+        "profile_sidebar_fill_color": "EFEFEF",
+        "profile_text_color": "333333",
+        "profile_use_background_image": true,
+        "protected": false,
+        "screen_name": "EconomistSaif",
+        "statuses_count": 907,
+        "time_zone": null,
+        "url": "https://t.co/DWQoagPmdM",
+        "utc_offset": null,
+        "verified": false
+    }
+}

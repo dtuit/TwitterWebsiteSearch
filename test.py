@@ -3,6 +3,7 @@ import lxml
 import lxml.html as lh
 import json
 from datetime import datetime
+from operator import itemgetter
 
 import unittest
 
@@ -80,17 +81,63 @@ class TestTweetParsing2(ParametrizedTestCase):
         except ValueError:
             self.fail('parsed tweet created_at "{}" is formated incorrectly'.format(self.datetime_format))
 
-
     def test_parsed_date_matches_api_date(self):
-        
         p_date = self.param['parsed']['created_at']
         a_date = self.param['api']['created_at']
-        'Sun Aug 28 02:19:13 +0000 2016'
-        self.assertEqual(datetime.strptime(p_date, self.datetime_format),
-         datetime.strptime(a_date, '%a %b %d %H:%M:%S %z %Y'))
+
+        self.assertEqual(datetime.strptime(p_date, self.datetime_format), datetime.strptime(a_date, '%a %b %d %H:%M:%S %z %Y'))
     
     def test_parsed_counts_match_api_counts(self):
-        pass 
+        p_rt = self.param['parsed']['retweet_count']
+        a_rt = self.param['api']['retweet_count']
+        
+        p_fav = self.param['parsed']['favorite_count']
+        a_fav = self.param['api']['favorite_count']
+
+        self.assertEqual(p_rt, a_rt)
+        self.assertEqual(p_fav, a_fav)
+    
+    def test_parsed_user_data_matches_api_user_data(self):
+        self.assertEqual(self.param['parsed']['user']['id_str'], self.param['api']['user']['id_str'])
+        self.assertEqual(self.param['parsed']['user']['name'], self.param['api']['user']['name'])
+        self.assertEqual(self.param['parsed']['user']['screen_name'], self.param['api']['user']['screen_name'])
+        self.assertEqual(self.param['parsed']['user']['profile_image_url'], self.param['api']['user']['profile_image_url'])
+        self.assertEqual(self.param['parsed']['user']['verified'], self.param['api']['user']['verified'])
+
+    def test_parsed_hashtags_match_api_hashtags(self):
+        p_ht = [x['text'] for x in self.param['parsed']['entities']['hashtags']]
+        a_ht = [x['text'] for x in self.param['api']['entities']['hashtags']]
+
+        self.assertEqual(p_ht, a_ht)
+
+    def test_parsed_urls_match_api_urls(self):
+        p_urls = [x for x in self.param['parsed']['entities']['urls']]
+        a_urls = [testUtils.removekey(x, 'indices') for x in self.param['api']['entities']['urls']]
+
+        self.assertEqual(p_urls, a_urls)
+
+    def test_parsed_symbols_match_api_symbols(self):
+        p_ht = [x['text'] for x in self.param['parsed']['entities']['symbols']]
+        a_ht = [x['text'] for x in self.param['api']['entities']['symbols']]
+    
+        self.assertEqual(p_ht, a_ht)
+    
+    def test_parsed_usermentions_match_api_usermentions(self):
+        p_um = [x for x in self.param['parsed']['entities']['user_mentions']]
+        a_um = [{'id_str': x['id_str'], 'screen_name': x['screen_name']} for x in self.param['api']['entities']['user_mentions']]
+    
+        self.assertEqual(p_um, a_um)
+
+
+class testUtils():
+    def __init__(self):
+        pass
+    
+    @staticmethod
+    def removekey(d, key):
+        r = dict(d)
+        del r[key]
+        return r
 
 def run_tests():
     suite = unittest.TestSuite()
@@ -98,14 +145,13 @@ def run_tests():
     on_file_test_data_tweet_ids = [
             '769043391917199360',
             '769706112614629376',
-            '769720966364667904']
+            '769720966364667904',
+            '294560429865320448']
 
     test_data = TweetTestDataPrepareFromFile(on_file_test_data_tweet_ids).get_test_data()
-    
     for data in test_data:
         suite.addTest(ParametrizedTestCase.parametrize(TestTweetParsing2, param=data))
-
-    unittest.TextTestRunner(verbosity=1).run(suite)
+    unittest.TextTestRunner(verbosity=2).run(suite)
 
 
 if __name__ == '__main__':

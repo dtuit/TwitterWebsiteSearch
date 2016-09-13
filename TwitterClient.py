@@ -230,16 +230,16 @@ class TwitterClient():
         if len(date_span) > 0:
             timestamp = int(date_span[0].get('data-time-ms'))/1000
             tweet['created_at'] = datetime.fromtimestamp(timestamp, tz=pytz.utc).strftime('%a %b %d %H:%M:%S %z %Y') 
-        tzinfo=datetime.timezone.utc
+
         #Retweet and Favoritte counts
         counts = li.cssselect('span.ProfileTweet-action--retweet, span.ProfileTweet-action--favorite')
         if len(counts) > 0:
             for c in counts:
                 classes = c.get('class').split(' ')
                 if 'ProfileTweet-action--retweet' in classes:
-                    tweet['retweet_count'] = c[0].get('data-tweet-stat-count')
+                    tweet['retweet_count'] = int(c[0].get('data-tweet-stat-count'))
                 elif 'ProfileTweet-action--favorite' in classes:
-                    tweet['favorite_count'] = c[0].get('data-tweet-stat-count')
+                    tweet['favorite_count'] = int(c[0].get('data-tweet-stat-count'))
 
         entities = tweet['entities']
         self._parse_tweet_entites(text_p, entities)
