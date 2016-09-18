@@ -1,10 +1,11 @@
-import TwitterClient
+from .context import TwitterWebsiteSearch
+from TwitterWebsiteSearch import TwitterClient
 import lxml
 import lxml.html as lh
 import json
 from datetime import datetime
 from operator import itemgetter
-
+import os
 import unittest
 
 class ParametrizedTestCase(unittest.TestCase):
@@ -30,7 +31,7 @@ class ParametrizedTestCase(unittest.TestCase):
 class TweetTestDataPrepareFromFile():
 
     def __init__(self, tweetIds):
-        self.twitterClient = TwitterClient.TwitterClient()
+        self.twitterClient = TwitterClient()
         self.test_tweet_ids = tweetIds
         self.test_data = self._get_test_files(self.test_tweet_ids)
     
@@ -41,8 +42,8 @@ class TweetTestDataPrepareFromFile():
         test_files = []
         for id in test_ids:
             tf = {}
-            tf['parsed'] = self._parse_tweet_from_html('./samplehtml/{}.html'.format(id))
-            tf['api'] = self._open_json_tweet_from_file('./samplehtml/{}.json'.format(id))
+            tf['parsed'] = self._parse_tweet_from_html( os.path.join(os.path.dirname(__file__), 'testsamplehtml/{}.html'.format(id)) )
+            tf['api'] = self._open_json_tweet_from_file( os.path.join(os.path.dirname(__file__), 'testsamplehtml/{}.json'.format(id)) )
             test_files.append(tf)
         return test_files
     def _parse_tweet_from_html(self, file_name):
@@ -139,7 +140,7 @@ class testUtils():
         del r[key]
         return r
 
-def run_tests():
+def suite():
     suite = unittest.TestSuite()
 
     on_file_test_data_tweet_ids = [
@@ -152,7 +153,3 @@ def run_tests():
     for data in test_data:
         suite.addTest(ParametrizedTestCase.parametrize(TestTweetParsing2, param=data))
     unittest.TextTestRunner(verbosity=2).run(suite)
-
-
-if __name__ == '__main__':
-    run_tests()
