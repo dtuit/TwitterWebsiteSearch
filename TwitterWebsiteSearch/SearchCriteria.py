@@ -1,6 +1,6 @@
 class SearchQueryBuilder():
 
-    def __init__(self):
+    def __init__(self, since, until, from_accounts, to_accounts, ):
         pass
 
     def since(self, date):
@@ -8,10 +8,7 @@ class SearchQueryBuilder():
     
     def until(self, date):
         pass
-    
-    def query(self, query):
-        pass
-    
+        
     def from_accounts(self, usernames):
         pass
 
