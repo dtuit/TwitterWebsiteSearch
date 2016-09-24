@@ -4,7 +4,6 @@ from requests.packages.urllib3.util import Retry
 from requests.adapters import HTTPAdapter
 from datetime import datetime, timezone
 from time import sleep
-import pytz
 import lxml
 import lxml.html as lh
 from urllib.parse import quote, urlsplit
@@ -80,6 +79,7 @@ class TwitterClient():
             '_result_json': result_json,
             'tweets': tweets
             }
+
     def user_query(self, user, min_tweet_id, max_tweet_id=None, additional_params=None):
         raise NotImplementedError
 
@@ -144,8 +144,9 @@ class TwitterClient():
         cookie = {}
         req = Request('GET', url, params=payload_str, cookies=cookie)
         return self.session.prepare_request(req)
-
-    def _encode_max_postion_param(self, min, max):
+    
+    @staticmethod
+    def _encode_max_postion_param(min, max):
         return "TWEET-{0}-{1}".format(min, max)
 
     def parse_tweets(self, items_html):
@@ -229,7 +230,7 @@ class TwitterClient():
         date_span = content_div.cssselect('span._timestamp')
         if len(date_span) > 0:
             timestamp = int(date_span[0].get('data-time-ms'))/1000
-            tweet['created_at'] = datetime.fromtimestamp(timestamp, tz=pytz.utc).strftime('%a %b %d %H:%M:%S %z %Y') 
+            tweet['created_at'] = datetime.fromtimestamp(timestamp, tz=timezone.utc).strftime('%a %b %d %H:%M:%S %z %Y') 
 
         #Retweet and Favoritte counts
         counts = li.cssselect('span.ProfileTweet-action--retweet, span.ProfileTweet-action--favorite')
