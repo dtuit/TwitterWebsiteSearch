@@ -9,6 +9,7 @@ import lxml.html as lh
 from urllib.parse import quote, urlsplit
 import re
 from operator import itemgetter
+from copy import deepcopy
 
 # import logging
 # logging.basicConfig(level=logging.DEBUG)
@@ -30,14 +31,20 @@ class TwitterClient():
     def init_default_session(retrys=5,backoff_factor=0.1):
         session = Session()
         session.headers.update(
-            {'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Ubuntu Chromium/29.0.1547.65 Chrome/29.0.1547.65 Safari/537.36',
-            'Accept-Encoding' : 'gzip, deflate, sdch, br'})
+            # {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/53.0.2785.116 Safari/537.36',
+            # 'Accept-Encoding' : 'gzip, deflate, sdch, br'})
+
+            {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/53.0.2785.116 Safari/537.36',
+            'Accept-Encoding' : 'gzip, deflate, sdch, br',
+            'Accept': 'application/json, text/javascript, */*; q=0.01',
+            'Accept-Language': 'en-GB,en-US;q=0.8,en;q=0.6',
+            'X-Requested-With': 'XMLHttpRequest'})
         retries = Retry(total=retrys,
                 backoff_factor=backoff_factor,
                 status_forcelist=[ 500, 502, 503, 504 ])
         session.mount('https://', HTTPAdapter(max_retries=retries))
-        # proxies = {'http': 'http://127.0.0.1:8888', 'https': 'https://127.0.0.1:8888'}
-        # session.proxies.update(proxies)
+        proxies = {'http': 'http://127.0.0.1:8888', 'https': 'https://127.0.0.1:8888'}
+        session.proxies.update(proxies)
         return session
 
     def __init__(self, 
@@ -53,18 +60,20 @@ class TwitterClient():
         self.search_url = 'https://twitter.com/i/search/timeline'
         self.user_url = 'https://twitter.com/i/profiles/show/{username}/timeline/tweets'
 
-    def search_query(self, query, min_tweet_id, max_tweet_id, additional_params=None):
+    def search_query(self, queryBuilder, raw_query_str=None):
         # Init query parameters
-        params = {'q' : quote(query)}
-        if additional_params is not None:
-            params = additional_params
-            params['q'] = quote(query)        
-
+        # params = {'q' : quote(query)}
+        # if additional_params is not None:
+        #     params = additional_params
+        #     params['q'] = quote(query)        
+        if raw_query_str is None:
+            raw_query_str = queryBuilder.build()
         # Create Request
-        if min_tweet_id is not None and max_tweet_id is not None:
-            params['max_position'] = self._encode_max_postion_param(min_tweet_id, max_tweet_id)
-        request = self._prepare_request(self.search_url, params)
+        # if qb.min_tweetId is not None and max_tweet_id is not None:
+        #     params['max_position'] = self._encode_max_postion_param(qb.min_tweetId, max_tweet_id)
+        # request = self._prepare_request(self.search_url, params)
 
+        request = self._prepare_request(self.search_url, raw_query_str)
         result = self._execute_request(request)
         result_json = result.json()
 
@@ -80,12 +89,14 @@ class TwitterClient():
             'tweets': tweets
             }
 
-    def user_query(self, user, min_tweet_id, max_tweet_id=None, additional_params=None):
-        raise NotImplementedError
+    # def user_query(self, user, qb.min_tweetId, max_tweet_id=None, additional_params=None):
+    #     raise NotImplementedError
 
-    def get_search_iterator(self, query, min_tweet_id=None, max_tweet_id=None, additional_params=None):
-        result = self.search_query(query, min_tweet_id, max_tweet_id, additional_params)
-        prev_min_tweet_id = None
+    def get_search_iterator(self, queryBuilder):
+        qb = qb_prev = deepcopy(queryBuilder)
+
+        result = self.search_query(qb)
+        prev_min_tweetId = None
         yield result
 
         while True:
@@ -97,10 +108,10 @@ class TwitterClient():
                 else:
                     # Sometimes the API stops returning tweets even when there are more
                     # we can try to find these tweets by modifying the max_position parameter.
-                    int_min_id = int(min_tweet_id)
-                    for x in range(8, len(min_tweet_id)): #TODO impl something more sophisticated 
-                        min_to_try = int_min_id - 10**x
-                        result = self.search(query, str(min_to_try), max_tweet_id, additional_params)
+                    int_minId = int(qb.min_tweetId)
+                    for x in range(8, len(qb.min_tweetId)): #TODO impl something more sophisticated 
+                        qb.min_tweetId = int_minId - 10**x
+                        result = self.search(qb)
                         if len(result['tweets']) > 0:
                             break
                     else:
@@ -108,41 +119,39 @@ class TwitterClient():
                         # if we didnt find any point to continue from, break.
                         break
 
-            if max_tweet_id is None:
-                max_tweet_id = result['tweets'][1]['id_str']
+            if qb.max_tweetId is None:
+                qb.max_tweetId = result['tweets'][0]['id_str']
             
             # In a high volume search query like 'a' must use the max_tweet_id provided by the result,
             # otherwise the same results will be returned many times. (only happens during the first ~10 pages of results)
             res_min_pos = result['_result_json'].get('min_position')
             if res_min_pos is not None:
                 split = res_min_pos.split('-')
-                max_tweet_id = split[2]
+                qb.max_tweetId = split[2]
 
-            prev_min_tweet_id = min_tweet_id
-            min_tweet_id = result['tweets'][-1]['id_str']
+            prev_min_tweetId = qb.min_tweetId
+            qb.min_tweetId = result['tweets'][-1]['id_str']
 
             # If the current request returns the same tweets as the last
             # the query is configured wrong
             # TODO create more accurate metric
-            if prev_min_tweet_id is min_tweet_id:
+            if prev_min_tweetId is qb.min_tweetId:
                 break
 
-            result = self.search_query(query, min_tweet_id, max_tweet_id, additional_params)
+            result = self.search_query(qb)
             
             yield result
 
     def _execute_request(self, prepared_request):
         try:
-            result = self.session.send(prepared_request, timeout=self.timeout)
-            # result = self.session.send(prepared_request, timeout=self.timeout, verify=False)
+            # result = self.session.send(prepared_request, timeout=self.timeout)
+            result = self.session.send(prepared_request, timeout=self.timeout, verify=False)
             return result
         except requests.exceptions.Timeout as e:
             raise
 
-    def _prepare_request(self, url, params):
-        payload_str = "&".join("%s=%s" % (k,v) for k,v in params.items())
-        cookie = {}
-        req = Request('GET', url, params=payload_str, cookies=cookie)
+    def _prepare_request(self, url, payload_str):
+        req = Request('GET', url, params=payload_str, cookies={})
         return self.session.prepare_request(req)
     
     @staticmethod
@@ -343,12 +352,17 @@ class TwitterClient():
                     entities['urls'].append(url)
 
 if __name__ == "__main__":
+
+    import SearchCriteria
+
     x = TwitterClient(timeout=None)
     try:
-        gen = x.get_search_iterator('$AAPL', None, None)
+        gen = x.get_search_iterator(SearchCriteria.SearchQueryBuilder('$APPL'))
         for res in gen:
             print(len(res['tweets']))
     except requests.exceptions.Timeout as e:
         print('asdf')
         print(e)
         
+def get_ids(tweets):
+    return [tweet['id_str'] for tweet in tweets]
