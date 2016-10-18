@@ -47,12 +47,12 @@ class TweetTestDataPrepareFromFile():
             test_files.append(tf)
         return test_files
     def _parse_tweet_from_html(self, file_name):
-        with open(file_name, 'r') as file:
+        with open(file_name, 'r', encoding="utf8") as file:
             tweet_tree = lh.fromstring(file.read())
             result = self.twitterClient._parse_tweet(tweet_tree)
             return result
     def _open_json_tweet_from_file(self, file_name):
-        with open(file_name, 'r') as file:
+        with open(file_name, 'r', encoding="utf8") as file:
             result = json.load(file)
             return result    
 

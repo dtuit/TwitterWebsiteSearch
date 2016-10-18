@@ -4,4 +4,4 @@ __pycache__
 *.pyc
 
 keys.json
-output*.txt
+*.output

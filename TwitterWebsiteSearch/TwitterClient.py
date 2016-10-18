@@ -27,13 +27,12 @@ from copy import deepcopy
 
 class TwitterClient():
     
+    FIDDLER_DEBUG = False
+
     @staticmethod
     def init_default_session(retrys=5,backoff_factor=0.1):
         session = Session()
         session.headers.update(
-            # {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/53.0.2785.116 Safari/537.36',
-            # 'Accept-Encoding' : 'gzip, deflate, sdch, br'})
-
             {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/53.0.2785.116 Safari/537.36',
             'Accept-Encoding' : 'gzip, deflate, sdch, br',
             'Accept': 'application/json, text/javascript, */*; q=0.01',
@@ -43,8 +42,11 @@ class TwitterClient():
                 backoff_factor=backoff_factor,
                 status_forcelist=[ 500, 502, 503, 504 ])
         session.mount('https://', HTTPAdapter(max_retries=retries))
-        proxies = {'http': 'http://127.0.0.1:8888', 'https': 'https://127.0.0.1:8888'}
-        session.proxies.update(proxies)
+
+        if TwitterClient.FIDDLER_DEBUG:
+            proxies = {'http': 'http://127.0.0.1:8888', 'https': 'https://127.0.0.1:8888'}
+            session.proxies.update(proxies)
+
         return session
 
     def __init__(self, 
@@ -61,36 +63,31 @@ class TwitterClient():
         self.user_url = 'https://twitter.com/i/profiles/show/{username}/timeline/tweets'
 
     def search_query(self, queryBuilder, raw_query_str=None):
-        # Init query parameters
-        # params = {'q' : quote(query)}
-        # if additional_params is not None:
-        #     params = additional_params
-        #     params['q'] = quote(query)        
+      
         if raw_query_str is None:
             raw_query_str = queryBuilder.build()
-        # Create Request
-        # if qb.min_tweetId is not None and max_tweet_id is not None:
-        #     params['max_position'] = self._encode_max_postion_param(qb.min_tweetId, max_tweet_id)
-        # request = self._prepare_request(self.search_url, params)
 
         request = self._prepare_request(self.search_url, raw_query_str)
-        result = self._execute_request(request)
-        result_json = result.json()
+        resp = self._execute_request(request)
+        resp_json = resp.json()
 
         # Extract Results
         tweets = []
-        if result_json is not None and result_json['items_html'] is not None:
-            tweets = self.parse_tweets(result_json['items_html']) 
-
-        return {
-            '_request': request,
-            '_result': result,
-            '_result_json': result_json,
-            'tweets': tweets
+        if resp_json is not None and resp_json['items_html'] is not None:
+            tweets = self.parse_tweets(resp_json['items_html']) 
+        
+        retval = resp_json
+        retval.update(
+            {
+                '_request': request,
+                '_response_raw': result,
+                'tweets': tweets
             }
+        )
+        return retval
 
-    # def user_query(self, user, qb.min_tweetId, max_tweet_id=None, additional_params=None):
-    #     raise NotImplementedError
+    def user_query(self, user):
+        raise NotImplementedError
 
     def get_search_iterator(self, queryBuilder):
         qb = qb_prev = deepcopy(queryBuilder)
@@ -124,7 +121,7 @@ class TwitterClient():
             
             # In a high volume search query like 'a' must use the max_tweet_id provided by the result,
             # otherwise the same results will be returned many times. (only happens during the first ~10 pages of results)
-            res_min_pos = result['_result_json'].get('min_position')
+            res_min_pos = result['response_json'].get('min_position')
             if res_min_pos is not None:
                 split = res_min_pos.split('-')
                 qb.max_tweetId = split[2]
@@ -141,11 +138,13 @@ class TwitterClient():
             result = self.search_query(qb)
             
             yield result
-
+    
     def _execute_request(self, prepared_request):
         try:
-            # result = self.session.send(prepared_request, timeout=self.timeout)
-            result = self.session.send(prepared_request, timeout=self.timeout, verify=False)
+            if TwitterClient.FIDDLER_DEBUG:
+                result = self.session.send(prepared_request, timeout=self.timeout, verify=False)
+            else:
+                result = self.session.send(prepared_request, timeout=self.timeout)
             return result
         except requests.exceptions.Timeout as e:
             raise
@@ -353,11 +352,12 @@ class TwitterClient():
 
 if __name__ == "__main__":
 
-    import SearchCriteria
-
+    import TwitterQuery
+    TwitterClient.FIDDLER_DEBUG = True
     x = TwitterClient(timeout=None)
+    TwitterQuery.SearchQuery('a')
     try:
-        gen = x.get_search_iterator(SearchCriteria.SearchQueryBuilder('$APPL'))
+        gen = x.get_search_iterator(TwitterQuery.SearchQuery('$AAPL'))
         for res in gen:
             print(len(res['tweets']))
     except requests.exceptions.Timeout as e:
