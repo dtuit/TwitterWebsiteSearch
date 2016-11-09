@@ -56,4 +56,5 @@ note: pass the query without url encoding.
 * [lxml](http://lxml.de/index.html)
 * [cssselect](https://pythonhosted.org/cssselect/)
 
-note. using lmxl directly instead of BeautifulSoup as BS was too slow.
+###Twitter Search Guide
+
