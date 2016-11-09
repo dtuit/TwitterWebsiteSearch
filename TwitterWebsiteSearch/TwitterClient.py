@@ -76,18 +76,55 @@ class TwitterClient():
         if resp_json is not None and resp_json['items_html'] is not None:
             tweets = self.parse_tweets(resp_json['items_html']) 
         
-        retval = resp_json
-        retval.update(
-            {
+        next_query = deepcopy(queryBuilder)
+        next_query.max_position = resp_json.get('min_position') #switch the labels because twitter mislabels them
+        next_query.min_position = resp_json.get('max_position')
+        next_query.reset_error_state = False
+
+        if len(tweets) > 0:
+            min_id = tweets[0]['id_str']
+            max_id = tweets[1]['id_str']
+
+        retval = {
                 '_request': request,
-                '_response_raw': result,
-                'tweets': tweets
+                '_response_raw': resp,
+                '_response_json': resp_json,
+                'refresh_query': queryBuilder,
+                'next_query': next_query,
+                'tweets': tweets,
+                'min_id': min_id if min_id else None,
+                'max_id': max_id if max_id else None
             }
-        )
         return retval
 
     def user_query(self, user):
         raise NotImplementedError
+
+    def get_search_iterator_2(self, search_query):
+        
+        # determine if this is the first query or a continuation.
+        search_query.autoset_reset_error_state()
+
+        result = self.search_query(search_query)
+        next_query = result['next_query']
+        yield result
+
+        while True:
+
+            if len(result['tweets']) == 0:
+                if not self.continue_on_empty_result:
+                    print('No tweets returned terminating program')
+                    break
+                else:
+                    break
+                    # TODO remimplement
+
+            result = self.search_query(next_query)
+            next_query = result['next_query']
+
+            yield result
+
+
 
     def get_search_iterator(self, queryBuilder):
         qb = qb_prev = deepcopy(queryBuilder)
@@ -357,7 +394,7 @@ if __name__ == "__main__":
     x = TwitterClient(timeout=None)
     TwitterQuery.SearchQuery('a')
     try:
-        gen = x.get_search_iterator(TwitterQuery.SearchQuery('$AAPL'))
+        gen = x.get_search_iterator_2(TwitterQuery.SearchQuery('$AAPL'))
         for res in gen:
             print(len(res['tweets']))
     except requests.exceptions.Timeout as e:
