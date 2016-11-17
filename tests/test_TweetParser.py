@@ -102,11 +102,11 @@ class TestTweetParsing2(ParametrizedTestCase):
         self.assertEqual(self.param['parsed']['user']['id_str'], self.param['api']['user']['id_str'])
         self.assertEqual(self.param['parsed']['user']['name'], self.param['api']['user']['name'])
         self.assertEqual(self.param['parsed']['user']['screen_name'], self.param['api']['user']['screen_name'])
-        self.assertEqual(self.param['parsed']['user']['profile_image_url'], self.param['api']['user']['profile_image_url'])
+        # self.assertEqual(self.param['parsed']['user']['profile_image_url'], self.param['api']['user']['profile_image_url'])
         self.assertEqual(self.param['parsed']['user']['verified'], self.param['api']['user']['verified'])
 
     def test_parsed_hashtags_match_api_hashtags(self):
-        p_ht = [x['text'] for x in self.param['parsed']['entities']['hashtags']]
+        p_ht = [x for x in self.param['parsed']['entities']['hashtags']]
         a_ht = [x['text'] for x in self.param['api']['entities']['hashtags']]
 
         self.assertEqual(p_ht, a_ht)
@@ -118,7 +118,7 @@ class TestTweetParsing2(ParametrizedTestCase):
         self.assertEqual(p_urls, a_urls)
 
     def test_parsed_symbols_match_api_symbols(self):
-        p_ht = [x['text'] for x in self.param['parsed']['entities']['symbols']]
+        p_ht = [x for x in self.param['parsed']['entities']['symbols']]
         a_ht = [x['text'] for x in self.param['api']['entities']['symbols']]
     
         self.assertEqual(p_ht, a_ht)

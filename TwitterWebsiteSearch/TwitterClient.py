@@ -81,6 +81,8 @@ class TwitterClient():
         next_query.min_position = resp_json.get('max_position')
         next_query.reset_error_state = False
 
+        min_id = max_id = None
+
         if len(tweets) > 0:
             min_id = tweets[0]['id_str']
             max_id = tweets[1]['id_str']
@@ -92,8 +94,8 @@ class TwitterClient():
                 'refresh_query': queryBuilder,
                 'next_query': next_query,
                 'tweets': tweets,
-                'min_id': min_id if min_id else None,
-                'max_id': max_id if max_id else None
+                'min_id': min_id,
+                'max_id': max_id
             }
         return retval
 
@@ -206,11 +208,16 @@ class TwitterClient():
             if 'data-item-id' not in li.attrib:
                 continue
             tweet = self._parse_tweet(li)
-            tweets.append(tweet)
+            if tweet is not None:
+                tweets.append(tweet)
 
         return tweets
 
     def _parse_tweet(self, tweetElement):
+        '''
+        Parses the attributes of a tweet from the tweetElement into a dict
+        returns None if there is an error in the tweet
+        '''
         li = tweetElement
         tweet = {
             'created_at' : None,
@@ -256,7 +263,7 @@ class TwitterClient():
         if len(user_img) > 0:
             tweet['user']['profile_image_url'] = user_img[0].get('src')
         
-        text_p = content_div.cssselect('p.tweet-text')
+        text_p = content_div.cssselect('p.tweet-text, p.js-tweet-text')
         if len(text_p) > 0:
             text_p = text_p[0]
             
@@ -267,7 +274,10 @@ class TwitterClient():
             #remove non breaking space and ellipsis
             tweet['text'] = text_p.text_content().replace(u"\xa0", u"").replace(u'\u2026', u"")
             tweet['lang'] = text_p.get('lang')
-        
+        else:
+            # there is no tweet text, unknown if this occurs
+            return None
+
         verified_span = content_div.cssselect('span.Icon--verified')
         if len(verified_span) > 0:
             tweet['user']['verified'] = True
@@ -366,15 +376,17 @@ class TwitterClient():
         if len(tags) > 0:
             for tag in tags:
                 classes = tag.get('class').split(' ')
-                if 'twitter-hashtag'in classes:
-                    entities['hashtags'].append(tag.text_content()) #TODO remove # symbol
+                if 'twitter-hashtag' in classes:
+                    entities['hashtags'].append(tag.text_content().strip(' \n#')) #TODO remove # symbol
                 elif 'twitter-cashtag' in classes:
-                    entities['symbols'].append(tag.text_content()) #TODO remove $ symbol
+                    entities['symbols'].append(tag.text_content().strip(' \n$')) #TODO remove $ symbol
                 elif 'twitter-atreply' in classes:
+
                     mentioned_user = {
                         'id_str' : tag.get('data-mentioned-user-id'),
-                        'screen_name' : tag.text_content() #TODO remove @ symbol
+                        'screen_name' : tag.get('href').strip('/') if tag.get('href') is not None else None
                     }
+                    
                     entities['user_mentions'].append(mentioned_user)
                 elif 'twitter-timeline-link' in classes: #TODO and 'u-hidden' not in classes
                     url = {
@@ -384,7 +396,7 @@ class TwitterClient():
                     }
                     display_url = tag.cssselect('span.js-display-url')
                     if len(display_url) > 0:
-                        url['display_url'] = display_url[0].text_content()
+                        url['display_url'] = str(display_url[0].text_content())
                     entities['urls'].append(url)
 
 if __name__ == "__main__":
