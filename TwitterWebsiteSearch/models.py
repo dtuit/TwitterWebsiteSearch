@@ -1,5 +1,5 @@
-# class Response():
-#     def __init__(self, tweets, next_query, this_query):
+class Response():
+    def __init__(self, refresh_query, prev_query, tweets, next_query, this_query):
 
 
 # class Tweet():

@@ -268,11 +268,17 @@ class TwitterClient():
             text_p = text_p[0]
             
             #hacky way to include Emojis
-            for item in text_p.cssselect('img.Emoji'):
-                item.tail = item.get('alt') + item.tail if item.tail else item.get('alt')
+            for emoj in text_p.cssselect('img.Emoji'):
+                emoj.tail = emoj.get('alt') + emoj.tail if emoj.tail else emoj.get('alt')
             
+            for invis in text_p.cssselect('span.invisible'):
+                invis.getparent().remove(invis)
+
+            for elips in text_p.cssselect('span.tco-ellipsis'):
+                elips.
+
             #remove non breaking space and ellipsis
-            tweet['text'] = text_p.text_content().replace(u"\xa0", u"").replace(u'\u2026', u"")
+            tweet['text'] = text_p.text_content().replace(u"\xa0", u"")
             tweet['lang'] = text_p.get('lang')
         else:
             # there is no tweet text, unknown if this occurs

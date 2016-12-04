@@ -42,7 +42,7 @@ def to_csv(query, page_limit):
 def simple_test():
     TwitterClient.FIDDLER_DEBUG = True
     tc = TwitterClient()
-    sq = SearchQuery('$AAPL')
+    sq = SearchQuery('a')
     tweet_iterator = tc.get_search_iterator_2(sq)
     dt_str = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
 
