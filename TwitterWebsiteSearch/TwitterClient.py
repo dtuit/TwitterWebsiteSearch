@@ -279,34 +279,6 @@ class TwitterClient():
             # there is no tweet text, unknown if this occurs
             return None
         
-        # text_p = content_div.cssselect('p.tweet-text, p.js-tweet-text')
-        # if len(text_p) > 0:
-        #     text_p = text_p[0]
-            
-        #     #hacky way to include Emojis
-        #     for emoj in text_p.cssselect('img.Emoji'):
-        #         emoj.tail = emoj.get('alt') + emoj.tail if emoj.tail else emoj.get('alt')
-            
-        #     #Modify Urls so they are correct
-        #     for url in text_p.cssselect('a.twitter-timeline-link'):
-        #         is_truncated = u'\u2026' in url.text_content()
-
-        #         url_disp = self.cssselect_0(url, 'span.js-display-url')
-        #         if url_disp is not None:
-        #             url_disp_text =  url_disp.text_content()
-        #             if is_truncated:
-        #                 url_disp_text = url_disp_text + u'\u2026'
-        #             url.attrib['xtract-display-url'] = url_disp_text
-
-        #         strip_elements(url, ['*'])      
-        #         url.text = ' ' + url.attrib['href']
-
-        #     tweet['text'] = text_p.text_content().replace('  http', ' http') # remove double any double spaces.
-        #     tweet['lang'] = text_p.get('lang')
-        # else:
-        #     # there is no tweet text, unknown if this occurs
-        #     return None
-
         verified_span = content_div.cssselect('span.Icon--verified')
         if len(verified_span) > 0:
             tweet['user']['verified'] = True
@@ -325,9 +297,6 @@ class TwitterClient():
                     tweet['retweet_count'] = int(c[0].get('data-tweet-stat-count'))
                 elif 'ProfileTweet-action--favorite' in classes:
                     tweet['favorite_count'] = int(c[0].get('data-tweet-stat-count'))
-
-        # entities = tweet['entities']
-        # self._parse_tweet_entites(text_p, entities)
 
         #Extract Quoted Status
         quoted_tweet_context = content_div.cssselect('div.QuoteTweet-innerContainer')
@@ -365,10 +334,6 @@ class TwitterClient():
                 qt_text = qt_text[0]
                 self._parse_tweet_text(qt_text, qtweet)
                 self._parse_tweet_entites(qt_text, qtweet['entities'])
-                # qtweet['text'] = qt_text.text_content()
-
-            # qt_entites = qtweet['entities']
-            # self._parse_tweet_entites(qt_text, qt_entites)
         
         # Extract Media entities
         tweet_media_context = content_div.cssselect('div.AdaptiveMedia-container')
@@ -399,9 +364,7 @@ class TwitterClient():
         return tweet
 
     def _parse_tweet_text(self, text_element, tweet):
-        # if len(text_p) > 0:
-        #     text_p = text_p[0]
-            
+           
         #hacky way to include Emojis
         for emoj in text_element.cssselect('img.Emoji'):
             emoj.tail = emoj.get('alt') + emoj.tail if emoj.tail else emoj.get('alt')
@@ -419,19 +382,13 @@ class TwitterClient():
             elif 'pic.twitter.com' in url.text:
                 url.attrib['xtract-display-url'] = url.text
             strip_elements(url, ['*'])      
-            # url.text = ' ' + url.attrib['href']
             url.text = url.attrib['href']
 
         tmp = str(text_element.text_content())
         for m in re.finditer(r'(?<!\s)(?<!\\n)(http|https)://', tmp): #add a space before urls where required
             tmp = tmp[:m.start()] + ' ' + tmp[m.start():]
 
-        # tweet['text'] = text_element.text_content().replace('  http', ' http') # remove double any double spaces.
         tweet['text'] = tmp
-
-        # self._parse_tweet_entites(text_p, tweet['entities'])
-        # else:
-            # there is no tweet text, unknown if this occurs
 
     def _parse_tweet_entites(self, element, entities):
         tags = element.cssselect('a.twitter-hashtag, a.twitter-cashtag, a.twitter-atreply, a.twitter-timeline-link')
@@ -456,9 +413,6 @@ class TwitterClient():
                         'expanded_url' : tag.get('data-expanded-url'),
                         'display_url' : tag.get('xtract-display-url')
                     }
-                    # display_url = tag.cssselect('span.js-display-url')
-                    # if len(display_url) > 0:
-                    #     url['display_url'] = str(display_url[0].text_content())
                     entities['urls'].append(url)
 
     
