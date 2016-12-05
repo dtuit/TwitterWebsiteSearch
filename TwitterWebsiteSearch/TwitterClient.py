@@ -11,6 +11,9 @@ import re
 from operator import itemgetter
 from copy import deepcopy
 
+#tmp import
+# from lxml import etree
+from lxml.etree import strip_elements
 # import logging
 # logging.basicConfig(level=logging.DEBUG)
 
@@ -177,7 +180,7 @@ class TwitterClient():
             result = self.search_query(qb)
             
             yield result
-    
+
     def _execute_request(self, prepared_request):
         try:
             if TwitterClient.FIDDLER_DEBUG:
@@ -195,7 +198,7 @@ class TwitterClient():
     @staticmethod
     def _encode_max_postion_param(min, max):
         return "TWEET-{0}-{1}".format(min, max)
-
+    
     def parse_tweets(self, items_html):
         try:
             html = lh.fromstring(items_html)
@@ -212,7 +215,8 @@ class TwitterClient():
                 tweets.append(tweet)
 
         return tweets
-
+    
+    
     def _parse_tweet(self, tweetElement):
         '''
         Parses the attributes of a tweet from the tweetElement into a dict
@@ -254,10 +258,12 @@ class TwitterClient():
             tweet['user']['name'] = content_div.get('data-name')
             tweet['user']['screen_name'] = content_div.get('data-screen-name')
         
-        reply_a = content_div.cssselect('div.tweet-context a.js-user-profile-link')
+        reply_a = content_div.cssselect('div.tweet-context a.js-user-profile-link') # tweet-context can be used by many functions, incl follow, reply, retweet only extract reply atm
         if len(reply_a) > 0:
-            tweet['in_reply_to_user_id'] = reply_a[0].get('data-user-id')
-            tweet['in_reply_to_screen_name'] = reply_a[0].get('href') # remove /
+
+            if len(content_div.cssselect('div.tweet-context span.Icon--reply')) > 0: # check if actually a reply
+                tweet['in_reply_to_user_id'] = reply_a[0].get('data-user-id')
+                tweet['in_reply_to_screen_name'] = reply_a[0].get('href').strip('/')
 
         user_img = content_div.cssselect('img.avatar')
         if len(user_img) > 0:
@@ -266,23 +272,40 @@ class TwitterClient():
         text_p = content_div.cssselect('p.tweet-text, p.js-tweet-text')
         if len(text_p) > 0:
             text_p = text_p[0]
-            
-            #hacky way to include Emojis
-            for emoj in text_p.cssselect('img.Emoji'):
-                emoj.tail = emoj.get('alt') + emoj.tail if emoj.tail else emoj.get('alt')
-            
-            for invis in text_p.cssselect('span.invisible'):
-                invis.getparent().remove(invis)
-
-            for elips in text_p.cssselect('span.tco-ellipsis'):
-                elips.
-
-            #remove non breaking space and ellipsis
-            tweet['text'] = text_p.text_content().replace(u"\xa0", u"")
+            self._parse_tweet_text(text_p, tweet)
             tweet['lang'] = text_p.get('lang')
+            self._parse_tweet_entites(text_p, tweet['entities'])
         else:
             # there is no tweet text, unknown if this occurs
             return None
+        
+        # text_p = content_div.cssselect('p.tweet-text, p.js-tweet-text')
+        # if len(text_p) > 0:
+        #     text_p = text_p[0]
+            
+        #     #hacky way to include Emojis
+        #     for emoj in text_p.cssselect('img.Emoji'):
+        #         emoj.tail = emoj.get('alt') + emoj.tail if emoj.tail else emoj.get('alt')
+            
+        #     #Modify Urls so they are correct
+        #     for url in text_p.cssselect('a.twitter-timeline-link'):
+        #         is_truncated = u'\u2026' in url.text_content()
+
+        #         url_disp = self.cssselect_0(url, 'span.js-display-url')
+        #         if url_disp is not None:
+        #             url_disp_text =  url_disp.text_content()
+        #             if is_truncated:
+        #                 url_disp_text = url_disp_text + u'\u2026'
+        #             url.attrib['xtract-display-url'] = url_disp_text
+
+        #         strip_elements(url, ['*'])      
+        #         url.text = ' ' + url.attrib['href']
+
+        #     tweet['text'] = text_p.text_content().replace('  http', ' http') # remove double any double spaces.
+        #     tweet['lang'] = text_p.get('lang')
+        # else:
+        #     # there is no tweet text, unknown if this occurs
+        #     return None
 
         verified_span = content_div.cssselect('span.Icon--verified')
         if len(verified_span) > 0:
@@ -303,9 +326,10 @@ class TwitterClient():
                 elif 'ProfileTweet-action--favorite' in classes:
                     tweet['favorite_count'] = int(c[0].get('data-tweet-stat-count'))
 
-        entities = tweet['entities']
-        self._parse_tweet_entites(text_p, entities)
+        # entities = tweet['entities']
+        # self._parse_tweet_entites(text_p, entities)
 
+        #Extract Quoted Status
         quoted_tweet_context = content_div.cssselect('div.QuoteTweet-innerContainer')
         if len(quoted_tweet_context) > 0:
             quoted_tweet_context = quoted_tweet_context[0]
@@ -339,11 +363,14 @@ class TwitterClient():
             qt_text = quoted_tweet_context.cssselect('div.QuoteTweet-text.tweet-text')
             if len(qt_text) > 0:
                 qt_text = qt_text[0]
-                qtweet['text'] = qt_text.text_content()
+                self._parse_tweet_text(qt_text, qtweet)
+                self._parse_tweet_entites(qt_text, qtweet['entities'])
+                # qtweet['text'] = qt_text.text_content()
 
-            qt_entites = qtweet['entities']
-            self._parse_tweet_entites(qt_text, qt_entites)
+            # qt_entites = qtweet['entities']
+            # self._parse_tweet_entites(qt_text, qt_entites)
         
+        # Extract Media entities
         tweet_media_context = content_div.cssselect('div.AdaptiveMedia-container')
         if len(tweet_media_context) > 0:
             tweet_media_context = tweet_media_context[0]
@@ -368,14 +395,43 @@ class TwitterClient():
                         'video_thumbnail' : re.search(re.compile(r"background-image:url\(\'(.*)\'"),tweet_media_video[0].cssselect('div.PlayableMedia-player')[0].get('style')).group(1)
                     }
                     tweet['entities']['media'].append(video)
-            # print(tweet['entities']['media'])
-
-        # else:
-        #     tweet_media_context = content_div.cssselect('div.card2')
-        #     if len(tweet_media_context) > 0:
-        #         pass
 
         return tweet
+
+    def _parse_tweet_text(self, text_element, tweet):
+        # if len(text_p) > 0:
+        #     text_p = text_p[0]
+            
+        #hacky way to include Emojis
+        for emoj in text_element.cssselect('img.Emoji'):
+            emoj.tail = emoj.get('alt') + emoj.tail if emoj.tail else emoj.get('alt')
+        
+        #Modify Urls so they are correct
+        for url in text_element.cssselect('a.twitter-timeline-link'):
+            is_truncated = u'\u2026' in url.text_content()
+
+            url_disp = self.cssselect_0(url, 'span.js-display-url')
+            if url_disp is not None:
+                url_disp_text =  url_disp.text_content()
+                if is_truncated:
+                    url_disp_text = url_disp_text + u'\u2026'
+                url.attrib['xtract-display-url'] = url_disp_text
+            elif 'pic.twitter.com' in url.text:
+                url.attrib['xtract-display-url'] = url.text
+            strip_elements(url, ['*'])      
+            # url.text = ' ' + url.attrib['href']
+            url.text = url.attrib['href']
+
+        tmp = str(text_element.text_content())
+        for m in re.finditer(r'(?<!\s)(?<!\\n)(http|https)://', tmp): #add a space before urls where required
+            tmp = tmp[:m.start()] + ' ' + tmp[m.start():]
+
+        # tweet['text'] = text_element.text_content().replace('  http', ' http') # remove double any double spaces.
+        tweet['text'] = tmp
+
+        # self._parse_tweet_entites(text_p, tweet['entities'])
+        # else:
+            # there is no tweet text, unknown if this occurs
 
     def _parse_tweet_entites(self, element, entities):
         tags = element.cssselect('a.twitter-hashtag, a.twitter-cashtag, a.twitter-atreply, a.twitter-timeline-link')
@@ -383,9 +439,9 @@ class TwitterClient():
             for tag in tags:
                 classes = tag.get('class').split(' ')
                 if 'twitter-hashtag' in classes:
-                    entities['hashtags'].append(tag.text_content().strip(' \n#')) #TODO remove # symbol
+                    entities['hashtags'].append(tag.text_content().strip(' \n#'))
                 elif 'twitter-cashtag' in classes:
-                    entities['symbols'].append(tag.text_content().strip(' \n$')) #TODO remove $ symbol
+                    entities['symbols'].append(tag.text_content().strip(' \n$'))
                 elif 'twitter-atreply' in classes:
 
                     mentioned_user = {
@@ -394,29 +450,38 @@ class TwitterClient():
                     }
                     
                     entities['user_mentions'].append(mentioned_user)
-                elif 'twitter-timeline-link' in classes: #TODO and 'u-hidden' not in classes
+                elif 'twitter-timeline-link' in classes:
                     url = {
                         'url': tag.get('href'),
                         'expanded_url' : tag.get('data-expanded-url'),
-                        'display_url' : None
+                        'display_url' : tag.get('xtract-display-url')
                     }
-                    display_url = tag.cssselect('span.js-display-url')
-                    if len(display_url) > 0:
-                        url['display_url'] = str(display_url[0].text_content())
+                    # display_url = tag.cssselect('span.js-display-url')
+                    # if len(display_url) > 0:
+                    #     url['display_url'] = str(display_url[0].text_content())
                     entities['urls'].append(url)
+
+    
+
+    def _parse_url_entites(self, element, entites):
+        pass
+    
+    def cssselect_0(self, element, cssselector):
+        sel_el = element.cssselect(cssselector)
+        if len(sel_el) > 0:
+            return sel_el[0]
+        return None
 
 if __name__ == "__main__":
 
     import TwitterQuery
-    TwitterClient.FIDDLER_DEBUG = True
+    # TwitterClient.FIDDLER_DEBUG = True
     x = TwitterClient(timeout=None)
-    TwitterQuery.SearchQuery('a')
     try:
-        gen = x.get_search_iterator_2(TwitterQuery.SearchQuery('$AAPL'))
+        gen = x.get_search_iterator_2(TwitterQuery.SearchQuery('apple filter:replies'))
         for res in gen:
             print(len(res['tweets']))
     except requests.exceptions.Timeout as e:
-        print('asdf')
         print(e)
         
 def get_ids(tweets):
