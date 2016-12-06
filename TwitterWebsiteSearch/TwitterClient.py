@@ -105,7 +105,7 @@ class TwitterClient():
     def user_query(self, user):
         raise NotImplementedError
 
-    def get_search_iterator_2(self, search_query):
+    def get_search_iterator(self, search_query):
         
         # determine if this is the first query or a continuation.
         search_query.autoset_reset_error_state()
@@ -129,57 +129,57 @@ class TwitterClient():
 
             yield result
 
+    # def binary_search_
 
+    # def get_search_iterator(self, queryBuilder):
+    #     qb = qb_prev = deepcopy(queryBuilder)
 
-    def get_search_iterator(self, queryBuilder):
-        qb = qb_prev = deepcopy(queryBuilder)
+    #     result = self.search_query(qb)
+    #     prev_min_tweetId = None
+    #     yield result
 
-        result = self.search_query(qb)
-        prev_min_tweetId = None
-        yield result
+    #     while True:
 
-        while True:
+    #         if len(result['tweets']) == 0:
+    #             if not self.continue_on_empty_result:
+    #                 print('No tweets returned terminating program')
+    #                 break
+    #             else:
+    #                 # Sometimes the API stops returning tweets even when there are more
+    #                 # we can try to find these tweets by modifying the max_position parameter.
+    #                 int_minId = int(qb.min_tweetId)
+    #                 for x in range(8, len(qb.min_tweetId)): #TODO impl something more sophisticated 
+    #                     qb.min_tweetId = int_minId - 10**x
+    #                     result = self.search(qb)
+    #                     if len(result['tweets']) > 0:
+    #                         break
+    #                 else:
+    #                     print('No tweets returned terminating program')
+    #                     # if we didnt find any point to continue from, break.
+    #                     break
 
-            if len(result['tweets']) == 0:
-                if not self.continue_on_empty_result:
-                    print('No tweets returned terminating program')
-                    break
-                else:
-                    # Sometimes the API stops returning tweets even when there are more
-                    # we can try to find these tweets by modifying the max_position parameter.
-                    int_minId = int(qb.min_tweetId)
-                    for x in range(8, len(qb.min_tweetId)): #TODO impl something more sophisticated 
-                        qb.min_tweetId = int_minId - 10**x
-                        result = self.search(qb)
-                        if len(result['tweets']) > 0:
-                            break
-                    else:
-                        print('No tweets returned terminating program')
-                        # if we didnt find any point to continue from, break.
-                        break
-
-            if qb.max_tweetId is None:
-                qb.max_tweetId = result['tweets'][0]['id_str']
+    #         if qb.max_tweetId is None:
+    #             qb.max_tweetId = result['tweets'][0]['id_str']
             
-            # In a high volume search query like 'a' must use the max_tweet_id provided by the result,
-            # otherwise the same results will be returned many times. (only happens during the first ~10 pages of results)
-            res_min_pos = result['response_json'].get('min_position')
-            if res_min_pos is not None:
-                split = res_min_pos.split('-')
-                qb.max_tweetId = split[2]
+    #         # In a high volume search query like 'a' must use the max_tweet_id provided by the result,
+    #         # otherwise the same results will be returned many times. (only happens during the first ~10 pages of results)
+    #         res_min_pos = result['response_json'].get('min_position')
+    #         if res_min_pos is not None:
+    #             split = res_min_pos.split('-')
+    #             qb.max_tweetId = split[2]
 
-            prev_min_tweetId = qb.min_tweetId
-            qb.min_tweetId = result['tweets'][-1]['id_str']
+    #         prev_min_tweetId = qb.min_tweetId
+    #         qb.min_tweetId = result['tweets'][-1]['id_str']
 
-            # If the current request returns the same tweets as the last
-            # the query is configured wrong
-            # TODO create more accurate metric
-            if prev_min_tweetId is qb.min_tweetId:
-                break
+    #         # If the current request returns the same tweets as the last
+    #         # the query is configured wrong
+    #         # TODO create more accurate metric
+    #         if prev_min_tweetId is qb.min_tweetId:
+    #             break
 
-            result = self.search_query(qb)
+    #         result = self.search_query(qb)
             
-            yield result
+    #         yield result
 
     def _execute_request(self, prepared_request):
         try:
@@ -373,12 +373,12 @@ class TwitterClient():
         for url in text_element.cssselect('a.twitter-timeline-link'):
             is_truncated = u'\u2026' in url.text_content()
 
-            url_disp = self.cssselect_0(url, 'span.js-display-url')
-            if url_disp is not None:
-                url_disp_text =  url_disp.text_content()
+            url_disp = url.cssselect('span.js-display-url')
+            if len(url_disp) > 0:
+                url_disp_text =  url_disp[0].text_content()
                 if is_truncated:
                     url_disp_text = url_disp_text + u'\u2026'
-                url.attrib['xtract-display-url'] = url_disp_text
+                url.attrib['xtract-display-url'] = url_disp_text # store for later extraction
             elif 'pic.twitter.com' in url.text:
                 url.attrib['xtract-display-url'] = url.text
             strip_elements(url, ['*'])      
@@ -415,24 +415,13 @@ class TwitterClient():
                     }
                     entities['urls'].append(url)
 
-    
-
-    def _parse_url_entites(self, element, entites):
-        pass
-    
-    def cssselect_0(self, element, cssselector):
-        sel_el = element.cssselect(cssselector)
-        if len(sel_el) > 0:
-            return sel_el[0]
-        return None
-
 if __name__ == "__main__":
 
     import TwitterQuery
     # TwitterClient.FIDDLER_DEBUG = True
     x = TwitterClient(timeout=None)
     try:
-        gen = x.get_search_iterator_2(TwitterQuery.SearchQuery('apple filter:replies'))
+        gen = x.get_search_iterator(TwitterQuery.SearchQuery('apple filter:replies'))
         for res in gen:
             print(len(res['tweets']))
     except requests.exceptions.Timeout as e:
