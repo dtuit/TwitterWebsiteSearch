@@ -1,11 +1,11 @@
-#TwitterWebsiteSearch 
+# TwitterWebsiteSearch 
 
 TwitterWebsiteSearch is a python script for searching and saving data from [Twitter.com search](https://twitter.com/search-home) without using the [official Twitter API](https://dev.twitter.com/rest/public/search). 
 This allows bypassing some of the limitations of the official twitter API
 
 * Get tweets older than 7 days. 
 
-##Data Format
+## Data Format
 Tweets extracted, are formatted similarly to the official API, detailed [here](https://dev.twitter.com/overview/api/tweets)
 
 each tweet is a python dict with the following structure.
@@ -40,7 +40,7 @@ each tweet is a python dict with the following structure.
 	'contains_video': False
 }
 ```
-##Usage
+## Usage
 note: pass the query without url encoding.
 ```python
 
@@ -57,20 +57,20 @@ for page in client.get_search_iterator(query):
 ```
 
 
-###Twitter Search Operator Guides
+### Twitter Search Operator Guides
 
 Useful resources for creating search queries.
 http://www.followthehashtag.com/help/hidden-twitter-search-operators-extra-power-followthehashtag/
 https://twitter.com/search-advanced
 https://dev.twitter.com/rest/public/search
 
-####Useful search operators
+#### Useful search operators
 
 * -filter:nativeretweets 
 * -filter:replies 
 * -filter:links
 
-###Dependencies 
+### Dependencies 
 
 * [requests](http://docs.python-requests.org)
 * [lxml](http://lxml.de/index.html)
